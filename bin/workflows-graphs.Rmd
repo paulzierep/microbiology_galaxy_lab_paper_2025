@@ -336,7 +336,8 @@ hc_y <- mm |> dist(method = "euclidean") |> hclust(method = "ward.D2")
 hc_x <- mm |> t() |> dist(method = "euclidean") |> hclust(method = "ward.D2")
 
 dt3$Name <- dt3$Name |> factor(levels = hc_y$labels[hc_y$order] |> rev())
-dt3$`EDAM operations 2` <-  dt3$`EDAM operations` |> as.character() |> factor(levels = hc_x$labels[hc_x$order] |> rev())
+dt3$`EDAM operations 2` <-  dt3$`EDAM operations` |> as.character() |> 
+    factor(levels = c(hc_x$labels[hc_x$order] |> rev() |> str_subset("Other", negate = TRUE), "Other"))
 
 gr3 <- dt3 |>
     ggplot(aes(`EDAM operations 2`, Name)) +
@@ -392,7 +393,6 @@ outfolder <- "../results/workflows/"
 dir.create(outfolder, showWarnings = FALSE)
 dir.create("../docs/extended/", showWarnings = FALSE)
 
-
 save_plot <- function(plot, filename, w, h) {
     
     ggsave(
@@ -412,10 +412,9 @@ save_plot <- function(plot, filename, w, h) {
     
 }
 
-
 save_plot(gr1, "../docs/extended/heatmap-edam", 16, 12)
 save_plot(gr2, "../docs/extended/extended_data_figure_4", 16, 8)
-save_plot(gr3, "../docs/extended/extended_data_figure_3", 9, 10)
+save_plot(gr3, "../docs/extended/extended_data_figure_3", 9, 12)
 
 
 # writexl::write_xlsx(dt2, paste0(outfolder, "/workflows-stats.xlsx"))
