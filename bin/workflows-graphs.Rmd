@@ -63,88 +63,89 @@ workflows_dt$`Suite ID` <- all_tools_dt[index]$`Suite ID`
 
 ```{r}
 
-dt1 <- workflows_dt |> tidyr::separate_rows("EDAM topics", sep = ",") |> setDT()
-dt1 <- dt1 |> tidyr::separate_rows("EDAM operations", sep = ",") |> setDT()
-
-dt1$`EDAM topics`    <- dt1$`EDAM topics` |> str_squish()
-dt1$`EDAM operation` <- dt1$`EDAM operation` |> str_squish()
-
-dt1 <- dt1[which(!is.na(`Suite ID`)), c("Name", "Suite ID", "EDAM topics", "EDAM operation"), with = FALSE] |> unique()
-
-dt1$`EDAM topics`    <- ifelse(dt1$`EDAM topics` == "", "Other", dt1$`EDAM topics`) |> str_wrap(50)
-dt1$`EDAM operation` <- ifelse(dt1$`EDAM operation` == "", "Other", dt1$`EDAM operation`) |> str_wrap(50)
-
-edam_operations <- dt1[, by = `EDAM operation`, .(N = Name |> unique() |> length())]
-edam_topics     <- dt1[, by = `EDAM topics`, .(N = Name |> unique() |> length())]
-
-edam_operations <- edam_operations[which(`EDAM operation` != "Other")] 
-edam_topics     <- edam_topics[which(edam_topics != "Other")]
-
-edam_operations <- edam_operations[order(-N)] |> head(14)
-edam_topics     <- edam_topics[order(-N)] |> head(14)
-
-dt1$`EDAM topics`    <- ifelse(dt1$`EDAM topics` %in% edam_topics$`EDAM topics`, dt1$`EDAM topics`, "Other")
-dt1$`EDAM operation` <- ifelse(dt1$`EDAM operation` %in% edam_operations$`EDAM operation`, dt1$`EDAM operation`, "Other")
-
-dt1$`EDAM topics`    <- dt1$`EDAM topics` |> factor(c(edam_topics$`EDAM topics`, "Other")) 
-dt1$`EDAM operation` <- dt1$`EDAM operation` |> factor(c(edam_operations$`EDAM operation`, "Other")) 
-
-
-dt1$value <- 1
-
-mm <- dt1[, c("Name", "Suite ID", "value"), with = FALSE] |> 
-    unique() |> 
-    dcast(Name ~ `Suite ID`, value.var = "value", fill = 0) |> 
-    as.matrix(rownames = "Name")
-
-hc_y <- mm |> dist(method = "binary") |> hclust(method = "ward.D2")
-hc_x <- mm |> t() |> dist(method = "binary") |> hclust(method = "ward.D2")
-
-
-dt1$Name <- dt1$Name |> factor(levels = hc_y$labels[hc_y$order])
-dt1$`Suite ID` <- dt1$`Suite ID` |> factor(levels = hc_x$labels[hc_x$order])
-
-gr1 <- dt1 |>
-    ggplot(aes(`Suite ID`, Name)) +
-    geom_tile(color = "white") +
-    
-    scale_x_discrete(expand = c(0, 0)) +
-    scale_y_discrete(expand = c(0, 0)) +
-    
-    # facet_grid(rows = vars(edam_clean), scales = "free", space = "free") +
-    
-    # facet_nested_wrap(vars(`EDAM topic`, `EDAM operation`)) +
-    
-    facet_grid2(
-        rows = vars(`EDAM topics`),
-        cols = vars(`EDAM operation`),
-        space = "free",
-        scales = "free"
-    ) +
-    
-    coord_cartesian(clip = "off", expand = TRUE) +
-    
-    theme_minimal(base_family = "Calibri") +
-    theme(
-        axis.text.x = element_text(size = 2.5, angle = 45, hjust = 1),
-        axis.text.y = element_text(size = 6),
-        
-        axis.title.x = element_text(margin = margin(t = 10)),
-        axis.title.y = element_text(margin = margin(r = 10)),
-        
-        panel.border = element_rect(fill = NA, color = "grey", linewidth = .15),
-        # axis.ticks = element_line(linewidth = .3, color = "grey"),
-        
-        strip.text.x = element_text(face = "bold"),
-        strip.text.y = element_text(face = "bold", angle = 0, hjust = 0),
-        
-        panel.grid.minor = element_blank(),
-        panel.grid.major = element_line(linetype = "dashed", lineend = "round", linewidth = .35),
-        
-        plot.margin = margin(10, 10, 10, 10)
-    ) +
-    
-    labs(y = "Workflows", x = "Galaxy Tool Suites")
+# dt1 <- workflows_dt |> tidyr::separate_rows("EDAM topics", sep = ",") |> setDT()
+# dt1 <- dt1 |> tidyr::separate_rows("EDAM operations", sep = ",") |> setDT()
+# 
+# dt1$`EDAM topics`    <- dt1$`EDAM topics` |> str_squish()
+# dt1$`EDAM operation` <- dt1$`EDAM operation` |> str_squish()
+# 
+# dt1 <- dt1[which(!is.na(`Suite ID`)), c("Name", "Suite ID", "EDAM topics", "EDAM operation"), with = FALSE] |> unique()
+# 
+# dt1$`EDAM topics`    <- ifelse(dt1$`EDAM topics` == "", "Other", dt1$`EDAM topics`) |> str_wrap(50)
+# dt1$`EDAM operation` <- ifelse(dt1$`EDAM operation` == "", "Other", dt1$`EDAM operation`) |> str_wrap(50)
+# 
+# edam_operations <- dt1[, by = `EDAM operation`, .(N = Name |> unique() |> length())]
+# edam_topics     <- dt1[, by = `EDAM topics`, .(N = Name |> unique() |> length())]
+# 
+# edam_operations <- edam_operations[which(`EDAM operation` != "Other")] 
+# edam_topics     <- edam_topics[which(edam_topics != "Other")]
+# 
+# edam_operations <- edam_operations[order(-N)] |> head(4)
+# # edam_topics     <- edam_topics[order(-N)] |> head(4)
+# edam_topics <- edam_topics[which(`EDAM topics` != "Other")]
+# 
+# dt1$`EDAM topics`    <- ifelse(dt1$`EDAM topics` %in% edam_topics$`EDAM topics`, dt1$`EDAM topics`, "Other")
+# dt1$`EDAM operation` <- ifelse(dt1$`EDAM operation` %in% edam_operations$`EDAM operation`, dt1$`EDAM operation`, "Other")
+# 
+# dt1$`EDAM topics`    <- dt1$`EDAM topics` |> factor(c(edam_topics$`EDAM topics`, "Other")) 
+# dt1$`EDAM operation` <- dt1$`EDAM operation` |> factor(c(edam_operations$`EDAM operation`, "Other")) 
+# 
+# 
+# dt1$value <- 1
+# 
+# mm <- dt1[, c("Name", "Suite ID", "value"), with = FALSE] |> 
+#     unique() |> 
+#     dcast(Name ~ `Suite ID`, value.var = "value", fill = 0) |> 
+#     as.matrix(rownames = "Name")
+# 
+# hc_y <- mm |> dist(method = "binary") |> hclust(method = "ward.D2")
+# hc_x <- mm |> t() |> dist(method = "binary") |> hclust(method = "ward.D2")
+# 
+# 
+# dt1$Name <- dt1$Name |> factor(levels = hc_y$labels[hc_y$order])
+# dt1$`Suite ID` <- dt1$`Suite ID` |> factor(levels = hc_x$labels[hc_x$order])
+# 
+# gr1 <- dt1 |>
+#     ggplot(aes(`Suite ID`, Name)) +
+#     geom_tile(color = "white") +
+#     
+#     scale_x_discrete(expand = c(0, 0)) +
+#     scale_y_discrete(expand = c(0, 0)) +
+#     
+#     # facet_grid(rows = vars(edam_clean), scales = "free", space = "free") +
+#     
+#     # facet_nested_wrap(vars(`EDAM topic`, `EDAM operation`)) +
+#     
+#     facet_grid2(
+#         rows = vars(`EDAM topics`),
+#         cols = vars(`EDAM operation`),
+#         space = "free",
+#         scales = "free"
+#     ) +
+#     
+#     coord_cartesian(clip = "off", expand = TRUE) +
+#     
+#     theme_minimal(base_family = "Calibri") +
+#     theme(
+#         axis.text.x = element_text(size = 2.5, angle = 45, hjust = 1),
+#         axis.text.y = element_text(size = 6),
+#         
+#         axis.title.x = element_text(margin = margin(t = 10)),
+#         axis.title.y = element_text(margin = margin(r = 10)),
+#         
+#         panel.border = element_rect(fill = NA, color = "grey", linewidth = .15),
+#         # axis.ticks = element_line(linewidth = .3, color = "grey"),
+#         
+#         strip.text.x = element_text(face = "bold"),
+#         strip.text.y = element_text(face = "bold", angle = 0, hjust = 0),
+#         
+#         panel.grid.minor = element_blank(),
+#         panel.grid.major = element_line(linetype = "dashed", lineend = "round", linewidth = .35),
+#         
+#         plot.margin = margin(10, 10, 10, 10)
+#     ) +
+#     
+#     labs(y = "Workflows", x = "Galaxy Tool Suites")
 
 ```
 
@@ -189,7 +190,7 @@ dt1$`EDAM operations` <- dt1$`EDAM operations` |> str_squish()
 dt1$`EDAM operations` <- dt1$`EDAM operations` |> str_wrap(50) # |> str_replace("DNA barcoding", "DNA\nbarcoding")
 
 edam_operations <- dt1[, by = `EDAM operations`, .(N = Name |> unique() |> length())]
-edam_operations <- edam_operations[order(-N)] |> head(14)
+edam_operations <- edam_operations[order(-N)] |> head(4)
 
 dt1$`EDAM operations` <- ifelse(dt1$`EDAM operations` %in% edam_operations$`EDAM operations`, dt1$`EDAM operations`, "Other")
 dt1$`EDAM operations` <- dt1$`EDAM operations` |> factor(c(edam_operations$`EDAM operations`, "Other")) 
@@ -412,7 +413,7 @@ save_plot <- function(plot, filename, w, h) {
     
 }
 
-save_plot(gr1, "../docs/extended/heatmap-edam", 16, 12)
+# save_plot(gr1, "../docs/extended/heatmap-edam", 16, 12)
 save_plot(gr2, "../docs/extended/extended_data_figure_4", 16, 8)
 save_plot(gr3, "../docs/extended/extended_data_figure_3", 9, 12)
 
