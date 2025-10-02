@@ -112,7 +112,7 @@ gr <- gr_df |>
         axis.title.y = element_markdown(margin = margin(r = 10))
     ) +
 
-    labs(x = "Target", y = "**Percentage in the microbial related papers**<br>citing Galaxy papers")
+    labs(x = "Target", y = "**Percentage in the microbiology related papers**<br>citing Galaxy papers")
 
 
 
