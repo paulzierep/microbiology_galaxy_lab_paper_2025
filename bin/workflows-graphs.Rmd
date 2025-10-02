@@ -414,7 +414,7 @@ save_plot <- function(plot, filename, w, h) {
 }
 
 # save_plot(gr1, "../docs/extended/heatmap-edam", 16, 12)
-save_plot(gr2, "../docs/extended/extended_data_figure_4", 16, 8)
+save_plot(gr2, "../docs/extended/extended_data_figure_6", 16, 8)
 save_plot(gr3, "../docs/extended/extended_data_figure_3", 9, 12)
 
 

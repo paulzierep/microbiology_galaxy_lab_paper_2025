@@ -491,9 +491,9 @@ multi2 <- (free(gr2) | free(gr)) +
 
 
 
-outfolder <- "../docs/extended/"
-
-dir.create(outfolder, showWarnings = FALSE)
+# outfolder <- "../docs/extended/"
+# 
+# dir.create(outfolder, showWarnings = FALSE)
 
 save_plot <- function(plot, filename, w, h) {
     
