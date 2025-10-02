@@ -333,9 +333,9 @@ p0$Topics <- "All"
 gr1_df <- rbind(p0, p1)
 
 gr1_df$Topics <- ifelse(
-    gr1_df$Topics == "All", "Non microbial-related",
+    gr1_df$Topics == "All", "Non microbiology-related",
     ifelse(
-        gr1_df$Topics == "", "Unlabeled microbial-related",
+        gr1_df$Topics == "", "Unlabeled microbiology-related",
         gr1_df$Topics
     )
 )
@@ -345,8 +345,8 @@ gr1_df$Topics <- ifelse(
 gr1_df$Topics <- gr1_df$Topics |> factor(levels = c("Ecosystem Dynamics & Biodiversity",
                                                     "Ecosystem Dynamics & Biodiversity, Health & Disease",
                                                     "Health & Disease",
-                                                    "Unlabeled microbial-related",
-                                                    "Non microbial-related"))
+                                                    "Unlabeled microbiology-related",
+                                                    "Non microbiology-related"))
 
 gr1 <- gr1_df |>
     ggplot(aes(year, counts)) +
@@ -372,8 +372,8 @@ gr1 <- gr1_df |>
     # scale_y_continuous(expand = c(0, 0), breaks = c(10, 20, 50, 100, 200, 500, 1000)) +
     # scale_y_continuous(expand = c(0, 0), transform = "log2", limits = c(0, 1100), breaks = seq(200, 1000, by = 200)) +
     
-    scale_fill_manual(values = c("Non microbial-related" = "grey" |> lighten(.25),
-                                 "Unlabeled microbial-related" = "#6abd66" |> darken(.1),
+    scale_fill_manual(values = c("Non microbiology-related" = "grey" |> lighten(.25),
+                                 "Unlabeled microbiology-related" = "#6abd66" |> darken(.1),
                                  "Ecosystem Dynamics & Biodiversity" = "#7ca07aff",
                                  "Ecosystem Dynamics & Biodiversity, Health & Disease" = "#BCB45D",
                                  "Health & Disease" = "#fbc73fff")) +
@@ -431,8 +431,8 @@ gr2 <- gr1_df[which(Topics == "All")] |>
     # scale_y_continuous(expand = c(0, 0), breaks = c(10, 20, 50, 100, 200, 500, 1000)) +
     # scale_y_continuous(expand = c(0, 0), transform = "log2", limits = c(0, 1100), breaks = seq(200, 1000, by = 200)) +
     
-    scale_fill_manual(values = c("Non microbial-related" = "grey" |> lighten(.25),
-                                 "Unlabeled microbial-related" = "#6abd66" |> darken(.1),
+    scale_fill_manual(values = c("Non microbiology-related" = "grey" |> lighten(.25),
+                                 "Unlabeled microbiology-related" = "#6abd66" |> darken(.1),
                                  "Ecosystem Dynamics & Biodiversity" = "#7ca07aff",
                                  "Ecosystem Dynamics & Biodiversity, Health & Disease" = "#BCB45D",
                                  "Health & Disease" = "#fbc73fff")) +

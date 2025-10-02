@@ -128,8 +128,8 @@
 <text x='108.09' y='80.90' style='font-size: 12.00px; font-family: "Calibri";' textLength='170.98px' lengthAdjust='spacingAndGlyphs'>Ecosystem Dynamics &amp; Biodiversity</text>
 <text x='108.09' y='98.18' style='font-size: 12.00px; font-family: "Calibri";' textLength='258.95px' lengthAdjust='spacingAndGlyphs'>Ecosystem Dynamics &amp; Biodiversity, Health &amp; Disease</text>
 <text x='108.09' y='115.46' style='font-size: 12.00px; font-family: "Calibri";' textLength='83.11px' lengthAdjust='spacingAndGlyphs'>Health &amp; Disease</text>
-<text x='108.09' y='132.74' style='font-size: 12.00px; font-family: "Calibri";' textLength='136.09px' lengthAdjust='spacingAndGlyphs'>Unlabeled microbial-related</text>
-<text x='108.09' y='150.02' style='font-size: 12.00px; font-family: "Calibri";' textLength='106.66px' lengthAdjust='spacingAndGlyphs'>Non microbial-related</text>
+<text x='108.09' y='132.74' style='font-size: 12.00px; font-family: "Calibri";' textLength='153.83px' lengthAdjust='spacingAndGlyphs'>Unlabeled microbiology-related</text>
+<text x='108.09' y='150.02' style='font-size: 12.00px; font-family: "Calibri";' textLength='124.39px' lengthAdjust='spacingAndGlyphs'>Non microbiology-related</text>
 <text x='17.62' y='26.82' text-anchor='middle' style='font-size: 22.00px; font-weight: bold; font-family: "Calibri";' textLength='13.33px' lengthAdjust='spacingAndGlyphs'>A</text>
 <rect x='774.31' y='28.79' width='242.73' height='77.32' style='stroke-width: 1.07; stroke: #D9D9D9;' />
 <polyline points='808.84,106.10 808.84,28.79 ' style='stroke-width: 0.53; stroke: #D9D9D9; stroke-dasharray: 1.00,3.00;' />
