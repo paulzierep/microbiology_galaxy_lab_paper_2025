@@ -13,7 +13,7 @@ library(colorspace)
 
 # helper function -------------------------
 
-plot_figure_1B <- function() {
+plot_figure_2B <- function() {
 
   ##  input data -------------------
 

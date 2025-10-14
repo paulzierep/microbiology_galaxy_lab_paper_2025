@@ -1,18 +1,17 @@
 
 # Load helpers --------------------------
 
-source("bin/helper_figure_1a.R")
-source("bin/helper_figure_1b.R")
+source("bin/helper_figure_2a.R")
+source("bin/helper_figure_2b.R")
 
 # Load `patchwork` ---------------
 
 library(patchwork)
 
-
 # patch plots -----------------
 
-a <- plot_figure_1A()
-b <- plot_figure_1B()
+a <- plot_figure_2A()
+b <- plot_figure_2B()
 
 multi <- (free(b$f2b) | free(a)) +
   plot_layout(widths = c(1, 1.25)) +

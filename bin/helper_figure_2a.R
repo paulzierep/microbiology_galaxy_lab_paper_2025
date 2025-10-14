@@ -18,7 +18,7 @@ library(extrafont)
 
 # helper function ----------------------
 
-plot_figure_1A <- function() {
+plot_figure_2A <- function() {
 
   ## Input data  -------------------------
 
