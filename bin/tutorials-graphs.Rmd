@@ -38,7 +38,7 @@ library(packcircles)
 ## THERE IS A BUG UNFORTUNATELY WITH fread FUNCTION
 ## RUN ON CONSOLE IN THIS CASE
 
-microGalaxy_tutorials_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_4.tsv"
+microGalaxy_tutorials_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_6.tsv"
 microGalaxy_tools_url     <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_2.tsv"
 # all_tools_url             <- "https://raw.githubusercontent.com/galaxyproject/galaxy_codex/refs/heads/main/communities/all/resources/tools.tsv"
 
@@ -236,8 +236,8 @@ edam_topics <- dt1$`EDAM topic` |>
     as.data.table()
 
 
-edam_operations <- edam_operations[order(-N)] |> head(9)
-edam_topics     <- edam_topics[order(-N)] |> head(9)
+edam_operations <- edam_operations[order(-N)] |> head(4)
+edam_topics     <- edam_topics[order(-N)] |> head(4)
 
 
 dt2 <- dt1 |> tidyr::separate_rows("EDAM topic", sep = ",") |> setDT()
@@ -528,8 +528,9 @@ save_plot <- function(plot, filename, w, h) {
     
 }
 
-save_plot(a_2, "../docs/extended/extended_figure_5", 20, 10)
-save_plot(multi, "../docs/extended/supplementary_figure_4", 12, 8)
+
+save_plot(multi, "../docs/extended/extended_data_figure_4", 12, 8)
+save_plot(a_2, "../docs/extended/extended_data_figure_7", 20, 10)
 
 # 1 ---------------
 
@@ -566,3 +567,6 @@ save_plot(multi, "../docs/extended/supplementary_figure_4", 12, 8)
 # )
 
 ```
+
+
+
