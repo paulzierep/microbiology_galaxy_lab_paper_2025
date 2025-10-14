@@ -142,83 +142,41 @@ dt2$`EDAM operation` <- ifelse(dt2$`EDAM operation` %in% edam_operations$V1, dt2
 dt2$`EDAM topic`     <- dt2$`EDAM topic` |> factor(c(edam_topics$V1, "Other")) 
 dt2$`EDAM operation` <- dt2$`EDAM operation` |> factor(c(edam_operations$V1, "Other")) 
 
-library(colorspace)
-
-dt3 <- dt2[, by = .(Title, `EDAM topic`, `EDAM operation`), .(N = `Suite ID` |> unique() |> length())]
-dt4 <- dt3[, c("Title", "N"), with = FALSE] |> unique()
-
-dt4 <- dt4[order(N)]
-
-dt3$Title <- dt3$Title |> factor(levels = dt4$Title)
-dt4$Title <- dt4$Title |> factor(levels = dt4$Title)
-
-a_3_i <- dt3 |>
-    ggplot(aes(y = Title)) +
-    geom_tile(aes(x = `EDAM operation`), fill = "#73a2c6", color = "grey", linewidth = .25) +
+a_2 <- dt2 |>
+    ggplot(aes(`Suite ID`, Title)) +
+    geom_tile(color = "white") +
+    
     scale_x_discrete(expand = c(0, 0)) +
     scale_y_discrete(expand = c(0, 0)) +
-    theme_minimal(base_family = "Calibri") +
-    theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(face = "bold"),
-        axis.ticks = element_line(color = "grey", linewidth = .25, lineend = "round"),
-        
-        panel.grid = element_blank(),
-        
-        panel.border = element_rect(color = "grey", fill = NA, linewidth = .25),
-        
-        plot.title = element_markdown(hjust = .5, family = "Calibri")
-    ) +
-    labs(title = "**EDAM**<br>operations", y = "Tutorials")
-
-a_3_ii <- dt3 |>
-    ggplot(aes(y = Title)) +
-    geom_tile(aes(x = `EDAM topic`), fill = "#f4777f", color = "grey", linewidth = .25) +
-    scale_x_discrete(expand = c(0, 0)) +
-    scale_y_discrete(expand = c(0, 0)) +
-    theme_minimal(base_family = "Calibri") +
-    theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        axis.text.y = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks.x = element_line(color = "grey", linewidth = .25, lineend = "round"),
-        panel.grid = element_blank(),
-        panel.border = element_rect(color = "grey", fill = NA, linewidth = .25),
-        
-        plot.title = element_markdown(hjust = .5, family = "Calibri")
+    
+    facet_grid2(
+        rows = vars(`EDAM topic`),
+        cols = vars(`EDAM operation`),
+        space = "free",
+        scales = "free"
     ) +
     
-    labs(title = "**EDAM**<br>topics")
-
-a_3_iii <- dt4 |>
-    ggplot(aes(y = Title)) +
-    geom_col(aes(x = N), fill = "#ffffe0" |> darken(.25), color = "grey10", linewidth = .25) +
-    geom_text(aes(x = N, label = N), position = position_nudge(x = .5),  
-              family = "Calibri", fontface = "bold", size = 4, hjust = 0, vjust = .5) +
-    
-    scale_x_continuous(expand = c(0, 0), limits = c(0, 18)) +
-    scale_y_discrete(expand = c(0, 0)) +
-    
     theme_minimal(base_family = "Calibri") +
-    
     theme(
-        axis.text.y = element_blank(),
-        # axis.text.x = element_text(face = "bold"),
-        axis.title = element_blank(),
-        panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.major = element_line(linetype = "dashed", lineend = "round"),
-        plot.title = element_markdown(hjust = .5, family = "Calibri")
+        axis.text.x = element_text(size = 4, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 6),
+        
+        axis.title.x = element_text(margin = margin(t = 10)),
+        axis.title.y = element_text(margin = margin(r = 10)),
+        
+        panel.border = element_rect(fill = NA, color = "grey", linewidth = .3),
+        # axis.ticks = element_line(linewidth = .3, color = "grey"),
+        
+        strip.text.x = element_text(face = "bold"),
+        strip.text.y = element_text(face = "bold", angle = 0, hjust = 0),
+        
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(linetype = "dashed", lineend = "round", linewidth = .15),
+        
+        plot.margin = margin(10, 10, 10, 10)
     ) +
     
-    labs(title = "No. of **Galaxy Tool<br>Suites** included")
-
-
-
-library(patchwork)
-
-multi <- (a_3_i | a_3_ii | a_3_iii) + plot_layout(widths = c(1, 1, 2))
+    labs(y = "Tutorials", x = "Galaxy Tool Suites")
 
 ## Saving graphs
 
@@ -248,4 +206,5 @@ save_plot <- function(plot, filename, w, h) {
     
 }
 
-save_plot(multi, "../docs/extended/extended_data_figure_4", 12, 8)
+
+save_plot(a_2, "../docs/extended/extended_data_figure_7", 20, 10)
