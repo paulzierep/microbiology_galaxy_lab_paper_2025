@@ -14,14 +14,14 @@ library(patchwork)
 a <- plot_figure_1A()
 b <- plot_figure_1B()
 
-multi <- (free(b$f1b) | free(a)) +
+multi <- (free(b$f2b) | free(a)) +
   plot_layout(widths = c(1, 1.25)) +
   plot_annotation(tag_levels = "A") &
   theme(
       plot.tag = element_text(size = 22, face = "bold", family = "Calibri")
   )
 
-multi2 <- (free(b$f1b_s) | free(a)) +
+multi2 <- (free(b$f2b_s) | free(a)) +
   plot_layout(widths = c(1, 1.25)) +
   plot_annotation(tag_levels = "A") &
   theme(
@@ -47,5 +47,5 @@ save_plot <- function(plot, filename, w, h) {
     
 }
 
-save_plot(multi, "../docs/figures/figure_1", 16, 8)
-save_plot(multi2, "../docs/figures/figure_1_v2", 16, 8)
+save_plot(multi, "../docs/figures/figure_2", 16, 8)
+save_plot(multi2, "../docs/figures/figure_2_v2", 16, 8)

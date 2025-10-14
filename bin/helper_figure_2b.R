@@ -171,6 +171,6 @@ plot_figure_1B <- function() {
     
     labs(x = "Year", y = "**Number of publications** citing Galaxy papers")
   
-  return(list("f1b" = gr1, "f1b_s" = gr2))
+  return(list("f2b" = gr1, "f2b_s" = gr2))
 
 }
