@@ -1,4 +1,3 @@
-
 # load data analytics libraries -----------------------
 
 library(data.table)
@@ -18,12 +17,11 @@ library(colorspace)
 # helper function -----------------------
 
 plot_figure_3A <- function() {
-
-  tools_url     <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_2.tsv"
+  tools_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_2.tsv"
   workflows_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_5.tsv"
   tutorials_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_6.tsv"
 
-  tools_dt     <- tools_url |> fread()
+  tools_dt <- tools_url |> fread()
   workflows_dt <- workflows_url |> fread()
   tutorials_dt <- tutorials_url |> fread()
 
@@ -56,30 +54,24 @@ plot_figure_3A <- function() {
   d4$category.x <- "Tutorials"
   d4$category.y <- "Workflows"
 
-  for(i in seq_along(d4$Date)) {
-      
-    if(i == 1) {
+  for (i in seq_along(d4$Date)) {
+    if (i == 1) {
       d4[i]$ypos.x <- 1
       d4[i]$ypos.y <- 1
-    } 
-    
-    if( is.na(d4[i]$ypos.x) ) d4[i]$ypos.x <- d4[i - 1]$ypos.x
-    if( is.na(d4[i]$ypos.y) ) d4[i]$ypos.y <- d4[i - 1]$ypos.y
-      
+    }
+
+    if (is.na(d4[i]$ypos.x)) d4[i]$ypos.x <- d4[i - 1]$ypos.x
+    if (is.na(d4[i]$ypos.y)) d4[i]$ypos.y <- d4[i - 1]$ypos.y
   }
 
   gr <- ggplot() +
     geom_area(data = d1, aes(Date, ypos), fill = "#4E79A7", alpha = .1) +
-    
-    stat_difference(data = d4, aes(Date, ymin = ypos.y, ymax = ypos.x), alpha = 0.5, levels = c("More tutorials", "More workflows"),) +
-
+    stat_difference(data = d4, aes(Date, ymin = ypos.y, ymax = ypos.x), alpha = 0.5, levels = c("More tutorials", "More workflows"), ) +
     geom_line(data = d1, aes(Date, ypos, color = category), linewidth = .75) +
     geom_line(data = d4, aes(Date, ypos.x, color = category.x), linewidth = .75) +
     geom_line(data = d4, aes(Date, ypos.y, color = category.y), linewidth = .75) +
-    
     scale_x_date(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0), breaks = seq(50, 300, by = 50), limits = c(0, 300)) +
-    
     scale_fill_manual(values = c("More tutorials" = "#F28E2B", "More workflows" = "#E15759")) +
     scale_color_manual(values = c("Tool suites" = "#4E79A7", "Tutorials" = "#F28E2B", "Workflows" = "#E15759")) +
     theme_minimal(base_family = "Calibri") +
@@ -88,14 +80,10 @@ plot_figure_3A <- function() {
       legend.text = element_text(size = 14),
       legend.position.inside = c(.25, .75),
       legend.position = "inside",
-      
       panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
-      
       axis.title.x = element_markdown(margin = margin(t = 10), face = "bold", size = 14),
       axis.title.y = element_markdown(margin = margin(r = 10), size = 14),
-      
       axis.text = element_text(size = 14),
-      
       axis.line = element_line(lineend = "round"),
       axis.ticks = element_line(lineend = "round")
     ) +

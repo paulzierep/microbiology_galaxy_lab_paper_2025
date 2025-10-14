@@ -1,5 +1,3 @@
-
-
 # Load helpers --------------------------
 
 source("bin/helper_figure_3a.R")
@@ -16,7 +14,7 @@ a <- plot_figure_3A()
 b <- plot_figure_3B()
 c <- plot_figure_3C()
 
-multi <- ((a | b) / c) + 
+multi <- ((a | b) / c) +
   plot_annotation(tag_levels = "A") &
   theme(
     plot.tag = element_text(face = "bold", size = 22, family = "Calibri"),
@@ -28,22 +26,20 @@ outfolder <- "../docs/extended/"
 dir.create(outfolder, showWarnings = FALSE)
 
 save_plot <- function(plot, filename, w, h) {
-    
   ggsave(
     plot = plot, filename = paste0(filename, ".png"),
     width = w, height = h, units = "in", dpi = 600
   )
-  
+
   ggsave(
     plot = plot, filename = paste0(filename, ".svg"),
     width = w, height = h, units = "in", dpi = 600
   )
-  
+
   ggsave(
     plot = plot, filename = paste0(filename, ".pdf"),
     width = w, height = h, units = "in", device = cairo_pdf
   )
-    
 }
 
 save_plot(multi, "../docs/figures/figure_3", 10, 12)

@@ -1,4 +1,3 @@
-
 # Load data analytics `libraries` ----------------------
 
 library(data.table)
@@ -19,7 +18,6 @@ library(extrafont)
 # helper function ----------------------
 
 plot_figure_2A <- function() {
-
   ## Input data  -------------------------
 
   df <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_technical_paper_2024/refs/heads/main/docs/supplementary/supplementary_table_1.tsv" |> fread()
@@ -28,7 +26,9 @@ plot_figure_2A <- function() {
 
   df$V1 <- NULL
 
-  df$Timestamp <- df$Timestamp |> str_split_i("\\ ", 1) |> lubridate::as_date(format = "%d/%m/%Y")
+  df$Timestamp <- df$Timestamp |>
+    str_split_i("\\ ", 1) |>
+    lubridate::as_date(format = "%d/%m/%Y")
 
   df$`Which country are you based in?` <- df$`Which country are you based in?` |>
     str_to_title() |>
@@ -45,7 +45,7 @@ plot_figure_2A <- function() {
   ## Columns of interest ---------------------
 
   coi <- c(
-    "Timestamp", 
+    "Timestamp",
     "What is your main target?",
     "Which techniques do you use?",
     "Which analysis do you use or would like to do?",
@@ -57,8 +57,8 @@ plot_figure_2A <- function() {
 
   df_1 <- df[, coi, with = FALSE]
 
-  colnames(df_1) = c(
-    "Timestamp", 
+  colnames(df_1) <- c(
+    "Timestamp",
     "MainTarget",
     "Techniques",
     "Analysis",
@@ -70,21 +70,21 @@ plot_figure_2A <- function() {
 
   ## What is your main target? -------------------------
 
-  p1 <- df_1$MainTarget |> 
-    str_remove_all("\\(|Protozoa, Helminths|Plasmodium falciparum|\\)") |>  
+  p1 <- df_1$MainTarget |>
+    str_remove_all("\\(|Protozoa, Helminths|Plasmodium falciparum|\\)") |>
     str_to_title() |>
     str_replace("Viruses", "Virus") |>
     str_replace("And Fungal Pathogens", "Fungal Pathogens") |>
-    str_split("\\,") |> 
-    lapply(str_squish) |> 
-    lapply(function(x) data.table("target" = x)) |> 
+    str_split("\\,") |>
+    lapply(str_squish) |>
+    lapply(function(x) data.table("target" = x)) |>
     rbindlist(idcol = "id")
 
   p1 <- p1[which(target != ""), by = target, .(N = id |> unique() |> length())]
 
   p1$group <- ifelse(p1$N > 1, p1$target, "Other")
 
-  p1 <- p1[, by = group, .( N = N |> sum())]
+  p1 <- p1[, by = group, .(N = N |> sum())]
 
   p1$Prop <- p1$N / sum(p1$N)
 
@@ -110,7 +110,7 @@ plot_figure_2A <- function() {
 
   p2$group <- ifelse(p2$N > 1, p2$technique, "Other")
 
-  p2 <- p2[, by = group, .( N = N |> sum())]
+  p2 <- p2[, by = group, .(N = N |> sum())]
 
   p2$Prop <- p2$N / sum(p2$N)
 
@@ -122,11 +122,9 @@ plot_figure_2A <- function() {
     str_replace("Mag", "MAG") |>
     str_replace("Snp", "SNP") |>
     str_replace("Mlst", "MLST") |>
-    
     str_replace("MAGs Building", "Metagenome Assembled Genome (MAG) Building") |>
     str_replace("SNP Identification", "Single Nucleotide Polymorphism (SNP) Identification") |>
     str_replace("Transcriptome Assembler", "Transcriptome Assembly") |>
-    
     str_split("\\,") |>
     lapply(str_squish) |>
     lapply(function(x) data.table("analysis" = x)) |>
@@ -137,13 +135,13 @@ plot_figure_2A <- function() {
 
   p3$group <- ifelse(p3$N > 1, p3$analysis, "Other")
 
-  p3 <- p3[, by = group, .( N = N |> sum())]
+  p3 <- p3[, by = group, .(N = N |> sum())]
 
   p3$Prop <- p3$N / sum(p3$N)
 
   ## Galaxy Obstacles ------------------------------
 
-  p4 <- df_1$ReasonNotUse |> 
+  p4 <- df_1$ReasonNotUse |>
     str_split("\\,") |>
     lapply(str_squish) |>
     lapply(function(x) data.table("reason" = x)) |>
@@ -165,27 +163,29 @@ plot_figure_2A <- function() {
 
   p6 <- df_1[, by = PreferenceToUse, .N]
 
-  p6[which(PreferenceToUse == "")]$PreferenceToUse = "Unknown"
+  p6[which(PreferenceToUse == "")]$PreferenceToUse <- "Unknown"
 
   p6$Prop <- p6$N / sum(p6$N)
 
   ## Merge data table lsit -----------
 
   df_plot <- list(
-    "What is your main target?"                                = p1,
-    "Which techniques do you use?"                             = p2,
-    "Which analysis do you use or would like to do?"           = p3,
+    "What is your main target?" = p1,
+    "Which techniques do you use?" = p2,
+    "Which analysis do you use or would like to do?" = p3,
     # "If you never or rarely use Galaxy, what are the reasons?" = p4,
     # "Survey answer by continent"                               = p5,
     "If the tools, platforms or databases from the previous question could be deployed in Galaxy would use prefer to use in there?" = p6
   ) |>
-    lapply(function(x) {    
+    lapply(function(x) {
       colnames(x) <- c("ylabel", "N", "Prop")
-      
+
       x <- x[order(-N)]
-      
-      x$label <- x$Prop |> round(digits = 4) |> scales::percent()
-      
+
+      x$label <- x$Prop |>
+        round(digits = 4) |>
+        scales::percent()
+
       return(x)
     }) |>
     rbindlist(idcol = "question")
@@ -197,70 +197,64 @@ plot_figure_2A <- function() {
 
   gr <- df_plot |>
     ggplot(aes(x = N, y = reorder_within(ylabel, N, question2))) +
-      
     geom_point(size = 2.95 + 2.20, aes(fill = Prop), shape = 21, stroke = .25, color = "grey25") +
     geom_col(width = .75, aes(fill = Prop), lineend = "round", color = "grey25", linewidth = .15) +
     geom_point(size = 2.71 + 2.20, aes(fill = Prop, color = Prop), shape = 21, stroke = .25) +
-      
-      
-    geom_shadowtext(aes(label = label), size = 3, hjust = 0, vjust = .5, position = position_nudge(x = 4.5),
-                    bg.r = .05, bg.color = "white", color = "black") +
-
+    geom_shadowtext(aes(label = label),
+      size = 3, hjust = 0, vjust = .5, position = position_nudge(x = 4.5),
+      bg.r = .05, bg.color = "white", color = "black"
+    ) +
     scale_y_reordered() +
-    scale_x_continuous(expand = c(0, 0), 
-                      limits = c(0, 123), 
-                      breaks = c(10, 25, 50, 75, 100), 
-                      minor_breaks = c(17.5, 37.5, 62.5, 87.5, 112.5)) +
-    
+    scale_x_continuous(
+      expand = c(0, 0),
+      limits = c(0, 123),
+      breaks = c(10, 25, 50, 75, 100),
+      minor_breaks = c(17.5, 37.5, 62.5, 87.5, 112.5)
+    ) +
     facet_grid2(vars(question2), scales = "free_y", space = "free_y") +
-      
-    scale_fill_stepsn(colors = paletteer_c("ggthemes::Red-Blue Diverging", 5, direction = -1),
-                      breaks = c(.2, .4, .6, .8),
-                      limits = c(0, .8),
-                      labels = scales::percent,
-                      guide = guide_colorsteps(barwidth = unit(12, "lines"), 
-                                              barheight = unit(.5, "lines"))) +
-    
-    scale_color_stepsn(colors = paletteer_c("ggthemes::Red-Blue Diverging", 5, direction = -1),
-                      breaks = c(.2, .4, .6, .8),
-                      limits = c(0, .8),
-                      guide = "none") +
-      
+    scale_fill_stepsn(
+      colors = paletteer_c("ggthemes::Red-Blue Diverging", 5, direction = -1),
+      breaks = c(.2, .4, .6, .8),
+      limits = c(0, .8),
+      labels = scales::percent,
+      guide = guide_colorsteps(
+        barwidth = unit(12, "lines"),
+        barheight = unit(.5, "lines")
+      )
+    ) +
+    scale_color_stepsn(
+      colors = paletteer_c("ggthemes::Red-Blue Diverging", 5, direction = -1),
+      breaks = c(.2, .4, .6, .8),
+      limits = c(0, .8),
+      guide = "none"
+    ) +
+
     # scale_fill_gradient(low = "#4E79A7" |> lighten(.25), high = "#E15759" |> darken(.3)) +
     # scale_color_gradient(low = "#4E79A7" |> lighten(.25), high = "#E15759" |> darken(.3)) +
-    
+
     coord_cartesian(clip = "off") +
-    
     theme_minimal(base_family = "Calibri") +
     theme(
-        # legend.position.inside = TRUE,
-        legend.position = "bottom",
-        legend.title.position = "top",
-        legend.title = element_text(family = "Calibri", size = 12),
-        legend.text = element_text(size = 12),
-        
-        strip.clip = "off",
-        strip.text.y.right = element_text(face = "bold", angle=0, vjust=.5, hjust = 0, size = 9),
-        strip.background = element_blank(),
-        
-        axis.title.y = element_blank(),
-        axis.title.x = element_text(margin = margin(t = 5), size = 12),
-        
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 11),
-        
-        panel.grid.major.y = element_blank(),
-        
-        panel.grid.minor.x = element_line(color = "grey85", linetype = "dotted", lineend = "round"),
-        panel.grid.major.x = element_line(color = "grey85"),
-        
-        panel.background = element_rect(fill = NA, color = "grey85"),
-        
-        axis.line = element_line(lineend = "round"),
-        axis.ticks = element_line(lineend = "round")
+      # legend.position.inside = TRUE,
+      legend.position = "bottom",
+      legend.title.position = "top",
+      legend.title = element_text(family = "Calibri", size = 12),
+      legend.text = element_text(size = 12),
+      strip.clip = "off",
+      strip.text.y.right = element_text(face = "bold", angle = 0, vjust = .5, hjust = 0, size = 9),
+      strip.background = element_blank(),
+      axis.title.y = element_blank(),
+      axis.title.x = element_text(margin = margin(t = 5), size = 12),
+      axis.text.x = element_text(size = 12),
+      axis.text.y = element_text(size = 11),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor.x = element_line(color = "grey85", linetype = "dotted", lineend = "round"),
+      panel.grid.major.x = element_line(color = "grey85"),
+      panel.background = element_rect(fill = NA, color = "grey85"),
+      axis.line = element_line(lineend = "round"),
+      axis.ticks = element_line(lineend = "round")
     ) +
-    
     labs(x = "Number of Responses", fill = "Proportion")
-    
+
   return(gr)
 }
