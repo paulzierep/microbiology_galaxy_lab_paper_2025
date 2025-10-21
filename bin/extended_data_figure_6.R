@@ -151,6 +151,6 @@ save_plot <- function(plot, filename, w, h) {
   )
 }
 
-save_plot(gr2, "../docs/extended/extended_data_figure_6", 16, 8)
+save_plot(gr2, "./docs/extended/extended_data_figure_6", 16, 8)
 
 # fwrite(dt2, paste0(outfolder, "/workflows-stats.tsv"), row.names = FALSE, quote = FALSE, sep = "\t")

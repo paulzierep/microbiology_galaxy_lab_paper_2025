@@ -43,5 +43,5 @@ save_plot <- function(plot, filename, w, h) {
   )
 }
 
-save_plot(multi, "../docs/figures/figure_2", 16, 8)
-save_plot(multi2, "../docs/figures/figure_2_v2", 16, 8)
+save_plot(multi, "./docs/figures/figure_2", 16, 8)
+save_plot(multi2, "./docs/figures/figure_2_v2", 16, 8)

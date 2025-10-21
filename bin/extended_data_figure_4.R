@@ -220,7 +220,7 @@ dir.create("../docs/extended/", showWarnings = FALSE)
 
 # dt --------------------------
 
-writexl::write_xlsx(dt1, "../results/tutorials/microGalaxy-tools.xlsx")
+# writexl::write_xlsx(dt1, "./results/tutorials/microGalaxy-tools.xlsx")
 
 save_plot <- function(plot, filename, w, h) {
   ggsave(
@@ -239,4 +239,4 @@ save_plot <- function(plot, filename, w, h) {
   )
 }
 
-save_plot(multi, "../docs/extended/extended_data_figure_4", 12, 8)
+save_plot(multi, "./docs/extended/extended_data_figure_4", 12, 8)

@@ -148,4 +148,4 @@ save_plot <- function(plot, filename, w, h) {
   )
 }
 
-save_plot(multi, "../docs/extended/extended_data_figure_2", 12, 12)
+save_plot(multi, "./docs/extended/extended_data_figure_2", 12, 12)

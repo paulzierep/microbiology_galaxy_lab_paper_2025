@@ -88,4 +88,4 @@ save_plot <- function(plot, filename, w, h) {
   )
 }
 
-save_plot(gr, "../docs/extended/extended_data_figure_1", 8, 6)
+save_plot(gr, "./docs/extended/extended_data_figure_1", 8, 6)

@@ -42,4 +42,4 @@ save_plot <- function(plot, filename, w, h) {
   )
 }
 
-save_plot(multi, "../docs/figures/figure_3", 10, 12)
+save_plot(multi, "./docs/figures/figure_3", 10, 12)
