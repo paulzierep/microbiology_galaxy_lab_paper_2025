@@ -1,15 +1,15 @@
 # Load data analytics libraries -------------------
 
-library(data.table)
-library(stringr)
+library(data.table, quietly = TRUE)
+library(stringr, quietly = TRUE)
 
 # load plotting libraries --------------------
 
-library(ggdensity)
-library(ggdist)
-library(ggforce)
+library(ggdensity, quietly = TRUE)
+library(ggdist, quietly = TRUE)
+library(ggforce, quietly = TRUE)
 
-library(tidytext)
+library(tidytext, quietly = TRUE)
 
 # helper function -------------------------
 

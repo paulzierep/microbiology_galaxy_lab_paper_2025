@@ -1,45 +1,54 @@
-# Load helpers --------------------------
+message("Figure 3 ...\t", appendLF = FALSE)
 
-source("bin/helper_figure_3a.R")
-source("bin/helper_figure_3b.R")
-source("bin/helper_figure_3c.R")
+suppressWarnings({
+  # Load helpers --------------------------
 
-# Load `patchwork` ---------------
+  suppressMessages({
+    source("bin/helper_figure_3a.R")
+    source("bin/helper_figure_3b.R")
+    source("bin/helper_figure_3c.R")
 
-library(patchwork)
+    # Load `patchwork` ---------------
 
-# patch plots -----------------
+    library(patchwork, quietly = TRUE)
+  })
 
-a <- plot_figure_3A()
-b <- plot_figure_3B()
-c <- plot_figure_3C()
+  # patch plots -----------------
 
-multi <- ((a | b) / c) +
-  plot_annotation(tag_levels = "A") &
-  theme(
-    plot.tag = element_text(face = "bold", size = 22, family = "Calibri"),
-    plot.margin = margin(10, 10, 10, 15)
-  )
+  a <- plot_figure_3A()
+  b <- plot_figure_3B()
+  c <- plot_figure_3C()
 
-outfolder <- "../docs/extended/"
+  multi <- ((a | b) / c) +
+    plot_annotation(tag_levels = "A") &
+    theme(
+      plot.tag = element_text(face = "bold", size = 22, family = "Calibri"),
+      plot.margin = margin(10, 10, 10, 15)
+    )
 
-dir.create(outfolder, showWarnings = FALSE)
+  outfolder <- "../docs/extended/"
 
-save_plot <- function(plot, filename, w, h) {
-  ggsave(
-    plot = plot, filename = paste0(filename, ".png"),
-    width = w, height = h, units = "in", dpi = 600
-  )
+  dir.create(outfolder, showWarnings = FALSE)
 
-  ggsave(
-    plot = plot, filename = paste0(filename, ".svg"),
-    width = w, height = h, units = "in", dpi = 600
-  )
+  save_plot <- function(plot, filename, w, h) {
+    ggsave(
+      plot = plot, filename = paste0(filename, ".png"),
+      width = w, height = h, units = "in", dpi = 600
+    )
 
-  ggsave(
-    plot = plot, filename = paste0(filename, ".pdf"),
-    width = w, height = h, units = "in", device = cairo_pdf
-  )
-}
+    ggsave(
+      plot = plot, filename = paste0(filename, ".svg"),
+      width = w, height = h, units = "in", dpi = 600
+    )
 
-save_plot(multi, "../docs/figures/figure_3", 10, 12)
+    ggsave(
+      plot = plot, filename = paste0(filename, ".pdf"),
+      width = w, height = h, units = "in", device = cairo_pdf
+    )
+  }
+
+  save_plot(multi, "./docs/figures/figure_3", 10, 12)
+})
+
+
+message("done!")

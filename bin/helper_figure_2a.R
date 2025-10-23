@@ -1,19 +1,19 @@
 # Load data analytics `libraries` ----------------------
 
-library(data.table)
-library(stringr)
+library(data.table, quietly = TRUE)
+library(stringr, quietly = TRUE)
 
 # Load plotting `libraries` ---------------------
 
-library(ggplot2)
-library(ggh4x)
+library(ggplot2, quietly = TRUE)
+library(ggh4x, quietly = TRUE)
 
-library(shadowtext)
+library(shadowtext, quietly = TRUE)
 
-library(paletteer)
-library(tidytext)
+library(paletteer, quietly = TRUE)
+library(tidytext, quietly = TRUE)
 
-library(extrafont)
+library(extrafont, quietly = TRUE)
 
 # helper function ----------------------
 

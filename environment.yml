@@ -20,9 +20,10 @@ dependencies:
 - r-ggrepel
 - r-ggtext
 - r-ggh4x
+- r-ggdist
+- r-ggforce
 - r-shadowtext
 - r-extrafont
 - r-paletteer
 - r-colorspace
-- r-packcircles
 - r-patchwork

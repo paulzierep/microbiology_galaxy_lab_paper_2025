@@ -1,13 +1,13 @@
 # Load data analytics `libraries` ----------------------
 
-library(data.table)
-library(stringr)
+library(data.table, quietly = TRUE)
+library(stringr, quietly = TRUE)
 
 # Load plotting `libraries` -----------------------
 
-library(ggstream)
-library(ggtext)
-library(colorspace)
+library(ggstream, quietly = TRUE)
+library(ggtext, quietly = TRUE)
+library(colorspace, quietly = TRUE)
 
 # helper function -------------------------
 

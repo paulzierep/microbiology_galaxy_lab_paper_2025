@@ -1,18 +1,18 @@
 # load data analytics libraries -----------------------
 
-library(data.table)
-library(stringr)
+library(data.table, quietly = TRUE)
+library(stringr, quietly = TRUE)
 
 # load plotting libraries ------------------
 
-library(ggplot2)
-library(ggrepel)
-library(ggtext)
-library(ggh4x)
+library(ggplot2, quietly = TRUE)
+library(ggrepel, quietly = TRUE)
+library(ggtext, quietly = TRUE)
+library(ggh4x, quietly = TRUE)
 
-library(extrafont)
-library(paletteer)
-library(colorspace)
+library(extrafont, quietly = TRUE)
+library(paletteer, quietly = TRUE)
+library(colorspace, quietly = TRUE)
 
 # helper function -----------------------
 
