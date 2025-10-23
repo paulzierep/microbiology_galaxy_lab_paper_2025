@@ -31,16 +31,15 @@ library(colorspace)
 ## Load input dataset 
 
 ```{r loaddata, include = FALSE}
-
 ## THIS SECTION MIGHT THROUGH AN ERROR
 ## THERE IS A BUG UNFORTUNATELY WITH fread FUNCTION
 ## RUN ON CONSOLE IN THIS CASE
 
-tools_url     <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_2.tsv"
+tools_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_2.tsv"
 workflows_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_5.tsv"
 tutorials_url <- "https://raw.githubusercontent.com/usegalaxy-eu/microgalaxy_paper_2025/refs/heads/main/docs/supplementary/supplementary_table_6.tsv"
 
-tools_dt     <- tools_url |> fread()
+tools_dt <- tools_url |> fread()
 workflows_dt <- workflows_url |> fread()
 tutorials_dt <- tutorials_url |> fread()
 ```
@@ -50,14 +49,16 @@ tutorials_dt <- tutorials_url |> fread()
 ### Extract availability information
 
 ```{r}
-index <- tools_dt |> colnames() |> str_subset("Number of tools on")
+index <- tools_dt |>
+  colnames() |>
+  str_subset("Number of tools on")
 
 availability <- tools_dt[, c("Suite ID", "EDAM reduced topics", index), with = FALSE] |> unique()
 
-colnames(availability) <- availability |> 
-    colnames() |> 
-    str_remove_all("Number\\ of\\ tools\\ on") |> 
-    str_squish()
+colnames(availability) <- availability |>
+  colnames() |>
+  str_remove_all("Number\\ of\\ tools\\ on") |>
+  str_squish()
 ```
 
 ### Filter out duplicates
@@ -66,7 +67,6 @@ colnames(availability) <- availability |>
 index <- which(availability$`Suite ID` %in% c("msstatstmt", "srst2") & availability$`EDAM reduced topics` == "")
 
 availability <- availability[-index]
-
 ```
 
 ### Hierarchical clustering
@@ -74,8 +74,12 @@ availability <- availability[-index]
 ```{r}
 mm <- availability[, -c(1, 2)] |> as.matrix(rownames = availability$`Suite ID`)
 
-mm_c <- mm |> dist(method = "manhattan") |> hclust(method = "ward.D2")
-mm_r <- t(mm) |> dist(method = "manhattan") |> hclust(method = "ward.D2")
+mm_c <- mm |>
+  dist(method = "manhattan") |>
+  hclust(method = "ward.D2")
+mm_r <- t(mm) |>
+  dist(method = "manhattan") |>
+  hclust(method = "ward.D2")
 ```
 
 ### Construct plotting data
@@ -85,14 +89,16 @@ d <- availability |> melt(id.vars = c("Suite ID", "EDAM reduced topics"), variab
 d <- d[which(value >= 1)]
 
 d$`Suite ID` <- d$`Suite ID` |> factor(levels = mm_c$labels[mm_c$order |> rev()])
-d$variable   <- d$variable |> factor(levels = mm_r$labels[mm_r$order |> rev()])
+d$variable <- d$variable |> factor(levels = mm_r$labels[mm_r$order |> rev()])
 
 d$fct <- ifelse(d$variable |> str_detect("UseGalaxy"), "UseGalaxy", "vOther")
 
 index <- d[which(fct == "UseGalaxy")][[1]] |> unique()
 
-p  <- d[which(`Suite ID` %in% index)]
-p2 <- p |> tidyr::separate_rows("EDAM reduced topics", sep = ",") |> setDT()
+p <- d[which(`Suite ID` %in% index)]
+p2 <- p |>
+  tidyr::separate_rows("EDAM reduced topics", sep = ",") |>
+  setDT()
 
 p2$`EDAM reduced topics` <- p2$`EDAM reduced topics` |> str_squish()
 p2$`EDAM reduced topics` <- p2$`EDAM reduced topics` |> str_wrap(width = 10)
@@ -108,48 +114,34 @@ p2$edam_clean <- p2$edam_clean |> factor(levels = c(t$`EDAM reduced topics`, "Ot
 ### Heatmap: Top 5 EDAM Operations
 
 ```{r}
-
 plot_heatmap <- function(edam_topics) {
-    
-    p2[which(edam_clean %in% edam_topics)] |> 
-        ggplot(aes(variable, `Suite ID`)) + 
-    
-        geom_tile(aes(fill = value), color = "grey") + 
-        
-        scale_fill_stepsn(
-            colors = c('#00429d', '#5681b9', '#93c4d2', '#ffffe0', '#ffa59e', '#dd4c65', '#93003a'),
-            guide = guide_colorsteps(barwidth = unit(.35, "lines"), barheight = unit(14, "lines")),
-            breaks = c(2, 4, 8, 16, 32, 64, 128),
-            limits = c(1, 129),
-            transform = "log2"
-        ) +
-        
-        facet_grid(cols = vars(fct), rows = vars(edam_clean), scales = "free", space = "free") +
-        
-        scale_y_discrete(expand = c(0, 0)) +
-        scale_x_discrete(expand = c(0, 0)) +
-        
-        theme_minimal(base_family = "Calibri") +
-        
-        theme(
-            legend.position = "bottom",
-            legend.title.position = "top",
-            
-            axis.text.x = element_text(angle = 45, hjust = 1),
-            axis.text.y = element_text(size = 8),
-            
-            panel.border = element_rect(fill = NA, color = "grey25"),
-            axis.ticks.x = element_line(lineend = "round", color = "grey25"),
-            
-            strip.text.x = element_blank(),
-            strip.text.y = element_text(face = "bold", angle = 0, hjust = 0, size = 12),
-            
-            panel.grid.minor = element_blank(),
-            panel.grid.major = element_line(linetype = "dashed", lineend = "round", linewidth = .25)
-        ) +
-        
-        labs(y = "Galaxy Tool Suites", x = "Availability of Tool Suites Across **Servers**", fill = "No. of Tools")
-    
+  p2[which(edam_clean %in% edam_topics)] |>
+    ggplot(aes(variable, `Suite ID`)) +
+    geom_tile(aes(fill = value), color = "grey") +
+    scale_fill_stepsn(
+      colors = c("#00429d", "#5681b9", "#93c4d2", "#ffffe0", "#ffa59e", "#dd4c65", "#93003a"),
+      guide = guide_colorsteps(barwidth = unit(.35, "lines"), barheight = unit(14, "lines")),
+      breaks = c(2, 4, 8, 16, 32, 64, 128),
+      limits = c(1, 129),
+      transform = "log2"
+    ) +
+    facet_grid(cols = vars(fct), rows = vars(edam_clean), scales = "free", space = "free") +
+    scale_y_discrete(expand = c(0, 0)) +
+    scale_x_discrete(expand = c(0, 0)) +
+    theme_minimal(base_family = "Calibri") +
+    theme(
+      legend.position = "bottom",
+      legend.title.position = "top",
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      axis.text.y = element_text(size = 8),
+      panel.border = element_rect(fill = NA, color = "grey25"),
+      axis.ticks.x = element_line(lineend = "round", color = "grey25"),
+      strip.text.x = element_blank(),
+      strip.text.y = element_text(face = "bold", angle = 0, hjust = 0, size = 12),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_line(linetype = "dashed", lineend = "round", linewidth = .25)
+    ) +
+    labs(y = "Galaxy Tool Suites", x = "Availability of Tool Suites Across **Servers**", fill = "No. of Tools")
 }
 
 c_1_a <- plot_heatmap(c("Metagenomics", "Sequence\nassembly")) + theme(axis.title.x = element_markdown())
@@ -159,59 +151,56 @@ c_1_b <- plot_heatmap(c("Sequence\nanalysis", "Genomics", "Sequencing")) + theme
 ### Heatmap: All Tools suties
 
 ```{r}
-
-# c_2 <- p |> 
-#     
-#     ggplot(aes(`Suite ID`, variable)) + 
-#     
-#     geom_tile(aes(fill = value), color = "grey") + 
-#     
+# c_2 <- p |>
+#
+#     ggplot(aes(`Suite ID`, variable)) +
+#
+#     geom_tile(aes(fill = value), color = "grey") +
+#
 #     scale_fill_stepsn(
 #         colors = c('#00429d', '#5681b9', '#93c4d2', '#ffffe0', '#ffa59e', '#dd4c65', '#93003a'),
 #         guide = guide_colorsteps(barwidth = unit(12, "lines"), barheight = unit(.5, "lines")),
 #         breaks = c(2, 4, 8, 16, 32, 64, 128),
 #         transform = "log2"
 #     ) +
-#     
+#
 #     facet_grid(rows = vars(fct), scales = "free", space = "free") +
-#     
+#
 #     scale_y_discrete(expand = c(0, 0)) +
-#     
+#
 #     theme_minimal(base_family = "Calibri") +
-#     
+#
 #     theme(
 #         legend.position = "bottom",
 #         legend.title.position = "top",
-#         
+#
 #         axis.text.x = element_text(angle = 45, hjust = 1, size = 4.5),
-#         
+#
 #         axis.title.y = element_markdown(),
-#         
+#
 #         panel.border = element_rect(fill = NA, color = "grey10"),
-#         
+#
 #         strip.text.y = element_blank(),
 #         strip.text.x = element_text(face = "bold", angle = 90, hjust = 0),
-#         
+#
 #         panel.grid.minor = element_blank(),
 #         panel.grid.major = element_line(linetype = "dashed", lineend = "round", linewidth = .35)
 #     ) +
-#     
+#
 #     labs(x = "Galaxy Tool Suites", y = "Availability of Tool Suites Across **Servers**", fill = "No. of Tools")
-
 ```
 
 ### Save plots
 
 ```{r}
-
 library(patchwork)
 
 
 multi <- (c_1_a | c_1_b) +
-    plot_layout(widths = c(1, 1.1), guides = "collect") &
-    theme(
-        legend.direction = "vertical"
-    )
+  plot_layout(widths = c(1, 1.1), guides = "collect") &
+  theme(
+    legend.direction = "vertical"
+  )
 
 
 outfolder <- "../docs/extended/"
@@ -219,22 +208,20 @@ outfolder <- "../docs/extended/"
 dir.create(outfolder, showWarnings = FALSE)
 
 save_plot <- function(plot, filename, w, h) {
-    
-    ggsave(
-        plot = plot, filename = paste0(filename, ".png"),
-        width = w, height = h, units = "in", dpi = 600
-    )
-    
-    ggsave(
-        plot = plot, filename = paste0(filename, ".svg"),
-        width = w, height = h, units = "in", dpi = 600
-    )
-    
-    ggsave(
-        plot = plot, filename = paste0(filename, ".pdf"),
-        width = w, height = h, units = "in", device = cairo_pdf
-    )
-    
+  ggsave(
+    plot = plot, filename = paste0(filename, ".png"),
+    width = w, height = h, units = "in", dpi = 600
+  )
+
+  ggsave(
+    plot = plot, filename = paste0(filename, ".svg"),
+    width = w, height = h, units = "in", dpi = 600
+  )
+
+  ggsave(
+    plot = plot, filename = paste0(filename, ".pdf"),
+    width = w, height = h, units = "in", device = cairo_pdf
+  )
 }
 
 save_plot(multi, "../docs/extended/extended_data_figure_2", 12, 12)
@@ -247,10 +234,16 @@ save_plot(multi, "../docs/extended/extended_data_figure_2", 12, 12)
 ### Split EDAM operation per tool
 
 ```{r}
-df2 = tools_dt |> tidyr::separate_rows("EDAM reduced operations", sep = ",") |> setDT()
+df2 <- tools_dt |>
+  tidyr::separate_rows("EDAM reduced operations", sep = ",") |>
+  setDT()
 
-w_dt <- workflows_dt |> tidyr::separate_rows("Tools", sep = ",") |> setDT()
-t_dt <- tutorials_dt |> tidyr::separate_rows("Tools", sep = ",") |> setDT()
+w_dt <- workflows_dt |>
+  tidyr::separate_rows("Tools", sep = ",") |>
+  setDT()
+t_dt <- tutorials_dt |>
+  tidyr::separate_rows("Tools", sep = ",") |>
+  setDT()
 
 w_dt$Tools <- w_dt$Tools |> str_squish()
 t_dt$Tools <- t_dt$Tools |> str_squish()
@@ -258,37 +251,38 @@ t_dt$Tools <- t_dt$Tools |> str_squish()
 df2$`Included in workflows` <- df2$`Suite ID` %in% w_dt$Tools
 df2$`Included in tutorials` <- df2$`Suite ID` %in% t_dt$Tools
 
-df2$`Included in` <- ifelse(df2$`Included in workflows` & df2$`Included in tutorials`, "Both", 
-                            ifelse(df2$`Included in tutorials`, "Tutorials",
-                                   ifelse(df2$`Included in workflows`, "Workflows", "Ν/Α")))
+df2$`Included in` <- ifelse(df2$`Included in workflows` & df2$`Included in tutorials`, "Both",
+  ifelse(df2$`Included in tutorials`, "Tutorials",
+    ifelse(df2$`Included in workflows`, "Workflows", "Ν/Α")
+  )
+)
 
 xvar <- "Suite runs (last 5 years) on main servers"
 yvar <- "Suite users (last 5 years) on main servers"
-    
-df2$runs  <- df2[[ xvar ]]
-df2$users <- df2[[ yvar ]]
 
+df2$runs <- df2[[xvar]]
+df2$users <- df2[[yvar]]
 ```
 
 ### Remove empty tools
 
 ```{r}
-df2 = df2[which(runs != 0 & users != 0)]
+df2 <- df2[which(runs != 0 & users != 0)]
 ```
 
 ### Clean `EDAM operation (no superclasses)` column
 
 ```{r}
-df2$`EDAM reduced operations` = df2$`EDAM reduced operations` |> str_squish()
-df2$`EDAM reduced operations` = ifelse(df2$`EDAM reduced operations` == "", "No Operation", df2$`EDAM reduced operations`)
+df2$`EDAM reduced operations` <- df2$`EDAM reduced operations` |> str_squish()
+df2$`EDAM reduced operations` <- ifelse(df2$`EDAM reduced operations` == "", "No Operation", df2$`EDAM reduced operations`)
 ```
 
 ### Find most top EDAM operations
 
 ```{r}
-st = df2[, by = `EDAM reduced operations`, .(N = `Suite ID` |> unique() |> length())]
-st = st[order(-N)]
-st = st[which(`EDAM reduced operations` != "No Operation")]
+st <- df2[, by = `EDAM reduced operations`, .(N = `Suite ID` |> unique() |> length())]
+st <- st[order(-N)]
+st <- st[which(`EDAM reduced operations` != "No Operation")]
 
 df2$`EDAM reduced operations` <- df2$`EDAM reduced operations` |> factor(levels = c(st$`EDAM reduced operations`, "No Operation"))
 
@@ -299,7 +293,7 @@ df2 <- df2[order(`Suite ID`, -`EDAM reduced operations`)]
 ### Keep only necessary columns
 
 ```{r}
-df2 = df2[, c("Suite ID", "runs", "users", "EDAM reduced operations", "Included in")] |> unique()
+df2 <- df2[, c("Suite ID", "runs", "users", "EDAM reduced operations", "Included in")] |> unique()
 ```
 
 ### Define factor levels of cluster column
@@ -326,13 +320,17 @@ hg0 <- df2[1:10, c("Suite ID", "runs", "users", "Included in"), with = FALSE] |>
 
 hg1 <- tools_dt[which(str_detect(`EDAM reduced topics`, "Microbial ecology|Phylogenetics"))]
 hg1 <- df2[which(`Suite ID` %in% hg1$`Suite ID`)]
-hg1 <- hg1[which(!(`Suite ID` %in% hg0$`Suite ID`)), c("Suite ID", "runs", "users", "Included in"), with = FALSE] |> unique() |> head()
+hg1 <- hg1[which(!(`Suite ID` %in% hg0$`Suite ID`)), c("Suite ID", "runs", "users", "Included in"), with = FALSE] |>
+  unique() |>
+  head()
 ```
 
 ### create graph
 
 ```{r}
-ncolors <- df2$cluster |> unique() |> length()
+ncolors <- df2$cluster |>
+  unique() |>
+  length()
 
 xvar <- xvar |> str_replace("Suite runs", "**Suite runs**")
 yvar <- yvar |> str_replace("Suite users", "**Suite users**")
@@ -347,222 +345,207 @@ library(ggforce)
 plot_dt <- df2[, c("Suite ID", "runs", "users", "Included in"), with = FALSE] |> unique()
 
 a <- plot_dt |>
-    ggplot(aes(runs, users)) +
-    
-    # geom_hdr_lines(data = plot_dt[which(`Included in` %in% c("Both", "Tutorials", "Workflows"))],
-    #                aes(runs, users, color = `Included in`),
-    #                probs = c(.75, 0.5), linewidth = .75) +
-    
-    # geom_hdr_rug(aes(fill = `Included in`, group = `Included in`), length = unit(.5, "lines")) +
-    # geom_mark_ellipse(aes(fill = `Included in`, label = `Included in`, filter = `Included in` %in% c("Both", "Tutorials", "Workflows"))) +
-    geom_point(aes(fill = `Included in`, color = `Included in`), shape = 21, stroke = .15, size = 2) +
-    
-    geom_hdr_lines(data = plot_dt[which(`Included in` %in% c("Both", "Tutorials", "Workflows"))],
-                   aes(runs, users, color = `Included in`),
-                   probs = c(.75, 0.5), linewidth = .75) +
-    
-    geom_text_repel(
-        data = hg0, aes(label = `Suite ID`),
-        bg.r = .075, bg.color = "grey96", fontface = "bold", family = "Calibri", box.padding = .5,
-        segment.size = .3, max.overlaps = Inf, size = 3.5
-    ) +
+  ggplot(aes(runs, users)) +
 
-    geom_text_repel(
-        data = hg1, aes(label = `Suite ID`),
-        bg.r = .05, bg.color = "grey96", fontface = "bold", family = "Calibri", box.padding = .5,
-        segment.size = .3, max.overlaps = Inf, size = 3.5
-    ) +
-    
-    scale_color_manual(values = c("Both" = "#8e2bf2", "Tutorials" = "#F28E2B", "Workflows" = "#E15759", "Ν/Α" = "grey"), guide = "none") +
-    scale_fill_manual(values = c("Both" = "#8e2bf2", "Tutorials" = "#F28E2B", "Workflows" = "#E15759", "Ν/Α" = "grey") |> lighten(.25)) +
-    scale_x_continuous(
-        trans = "log10",  # expand = c(0, 0), 
-        limits = c(1, 10000000), 
-        breaks = scales::trans_breaks("log10", function(x) 10^x),
-        labels = scales::trans_format("log10", scales::math_format(10^.x))
-    ) +
-    
-    scale_y_continuous(
-        trans = "log10", # limits = c(1, 10000),
-        labels = scales::comma, # expand = c(0, 0), 
-        breaks = c(.1, 1, 10, 100, 1000, 10000, 100000)
-    ) +
-    theme_minimal(base_family = "Calibri") +
-    theme(
-        legend.position = "inside",
-        legend.position.inside = c(.25, .7),
-        
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size = 14),
-        
-        strip.text = element_markdown(),
-        
-        axis.title.x = element_markdown(margin = margin(t = 10), size = 14),
-        axis.title.y = element_markdown(margin = margin(r = 10), size = 14),
-        axis.text = element_text(size = 14),
-        
-        # axis.ticks = element_line(linewidth = .3),
-        panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
-        
-        # panel.border = element_rect(linewidth = .3, fill = NA),
-        
-        axis.line = element_line(lineend = "round"),
-        axis.ticks = element_line(lineend = "round")
-    ) +
-    
-    labs(x = xvar, y = yvar, alpha = "Probabilities")
+  # geom_hdr_lines(data = plot_dt[which(`Included in` %in% c("Both", "Tutorials", "Workflows"))],
+  #                aes(runs, users, color = `Included in`),
+  #                probs = c(.75, 0.5), linewidth = .75) +
+
+  # geom_hdr_rug(aes(fill = `Included in`, group = `Included in`), length = unit(.5, "lines")) +
+  # geom_mark_ellipse(aes(fill = `Included in`, label = `Included in`, filter = `Included in` %in% c("Both", "Tutorials", "Workflows"))) +
+  geom_point(aes(fill = `Included in`, color = `Included in`), shape = 21, stroke = .15, size = 2) +
+  geom_hdr_lines(
+    data = plot_dt[which(`Included in` %in% c("Both", "Tutorials", "Workflows"))],
+    aes(runs, users, color = `Included in`),
+    probs = c(.75, 0.5), linewidth = .75
+  ) +
+  geom_text_repel(
+    data = hg0, aes(label = `Suite ID`),
+    bg.r = .075, bg.color = "grey96", fontface = "bold", family = "Calibri", box.padding = .5,
+    segment.size = .3, max.overlaps = Inf, size = 3.5
+  ) +
+  geom_text_repel(
+    data = hg1, aes(label = `Suite ID`),
+    bg.r = .05, bg.color = "grey96", fontface = "bold", family = "Calibri", box.padding = .5,
+    segment.size = .3, max.overlaps = Inf, size = 3.5
+  ) +
+  scale_color_manual(values = c("Both" = "#8e2bf2", "Tutorials" = "#F28E2B", "Workflows" = "#E15759", "Ν/Α" = "grey"), guide = "none") +
+  scale_fill_manual(values = c("Both" = "#8e2bf2", "Tutorials" = "#F28E2B", "Workflows" = "#E15759", "Ν/Α" = "grey") |> lighten(.25)) +
+  scale_x_continuous(
+    trans = "log10", # expand = c(0, 0),
+    limits = c(1, 10000000),
+    breaks = scales::trans_breaks("log10", function(x) 10^x),
+    labels = scales::trans_format("log10", scales::math_format(10^.x))
+  ) +
+  scale_y_continuous(
+    trans = "log10", # limits = c(1, 10000),
+    labels = scales::comma, # expand = c(0, 0),
+    breaks = c(.1, 1, 10, 100, 1000, 10000, 100000)
+  ) +
+  theme_minimal(base_family = "Calibri") +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(.25, .7),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 14),
+    strip.text = element_markdown(),
+    axis.title.x = element_markdown(margin = margin(t = 10), size = 14),
+    axis.title.y = element_markdown(margin = margin(r = 10), size = 14),
+    axis.text = element_text(size = 14),
+
+    # axis.ticks = element_line(linewidth = .3),
+    panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
+
+    # panel.border = element_rect(linewidth = .3, fill = NA),
+
+    axis.line = element_line(lineend = "round"),
+    axis.ticks = element_line(lineend = "round")
+  ) +
+  labs(x = xvar, y = yvar, alpha = "Probabilities")
 
 # a <- df2 |>
-# 
+#
 #     ggplot(aes(runs, users)) +
-# 
+#
 #     geom_point(
 #         shape = 21, size = 2, stroke = .25,
 #         aes(fill = cluster, color = cluster)
 #     ) +
-# 
+#
 #     geom_text_repel(
 #         data = hg0, aes(label = `Suite ID`),
 #         bg.r = .05, bg.color = "grey96", fontface = "bold", family = "Calibri", box.padding = .5,
 #         segment.size = .3, max.overlaps = Inf, size = 3
 #     ) +
-# 
+#
 #         geom_text_repel(
 #         data = hg1, aes(label = `Suite ID`),
 #         bg.r = .05, bg.color = "grey96", fontface = "bold", family = "Calibri", box.padding = .5,
 #         segment.size = .3, max.overlaps = Inf, size = 3
 #     ) +
-# 
+#
 #     scale_x_continuous(
 #         trans = "log10",  # expand = c(0, 0),
 #         limits = c(1, 10000000),
 #         breaks = scales::trans_breaks("log10", function(x) 10^x),
 #         labels = scales::trans_format("log10", scales::math_format(10^.x))
 #     ) +
-# 
+#
 #     scale_y_continuous(
 #         trans = "log10", # limits = c(1, 10000),
 #         labels = scales::comma, # expand = c(0, 0),
 #         breaks = c(.1, 1, 10, 100, 1000, 10000)
 #     ) +
-# 
+#
 #     scale_fill_manual(values = c(paletteer_d("ggsci::default_igv", ncolors - 1), "grey") |> lighten(.25), guide = guide_legend(ncol = 3, override.aes = list(size = 2.5))) +
 #     scale_color_manual(values = c(paletteer_d("ggsci::default_igv", ncolors - 1), "grey") |> darken(.25), guide = "none") +
-# 
+#
 #     coord_cartesian() +
-# 
+#
 #     theme_minimal(base_family = "Calibri") +
-# 
+#
 #     theme(
 #         legend.position = "bottom",
 #         legend.title.position = "top",
 #         legend.justification = "left",
-# 
+#
 #         strip.text = element_markdown(),
-# 
+#
 #         axis.title.x = element_markdown(margin = margin(t = 10)),
 #         axis.title.y = element_markdown(margin = margin(r = 10)),
-# 
+#
 #         # axis.ticks = element_line(linewidth = .3),
 #         panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
-# 
+#
 #         # panel.border = element_rect(linewidth = .3, fill = NA),
-# 
+#
 #         axis.line = element_line(lineend = "round"),
 #         axis.ticks = element_line(lineend = "round")
 #     ) +
-# 
+#
 #     labs(x = xvar, y = yvar, fill = "EDAM operation")
 
 library(tidytext)
 
-plot_dt_2 <- df2[,-c("EDAM reduced operations"), with = FALSE] |>
-    unique() |> 
-    melt(
-        id.vars = c("Suite ID", "Included in", "cluster"),
-        variable.factor = FALSE, value.factor = FALSE
-    )
+plot_dt_2 <- df2[, -c("EDAM reduced operations"), with = FALSE] |>
+  unique() |>
+  melt(
+    id.vars = c("Suite ID", "Included in", "cluster"),
+    variable.factor = FALSE, value.factor = FALSE
+  )
 
 plot_dt_2[, by = .(cluster, variable), value_median := value |> median()]
 
 # reorder <- plot_dt_2[which(cluster != "Other"), by = .(cluster, variable), .(value = value |> median())]
 # reorder <- reorder[order(-value)]
-# 
+#
 # plot_dt_2$cluster <- plot_dt_2$cluster |> factor(levels = c(reorder$cluster |> unique(), "Other"))
 
-plot_dt_2$variable <- plot_dt_2$variable |> str_replace_all("runs", xvar) |> str_replace_all("users", yvar)
+plot_dt_2$variable <- plot_dt_2$variable |>
+  str_replace_all("runs", xvar) |>
+  str_replace_all("users", yvar)
 
 hg2 <- plot_dt_2[, by = variable, .(value = value |> median())]
 
 b <- plot_dt_2 |>
-    ggplot(aes(reorder_within(cluster, -value_median, variable), value)) +
-    
-    
-    geom_hline(data = hg2, aes(yintercept = value), color = "white", linewidth = 1.15) +
-    geom_hline(data = hg2, aes(yintercept = value), color = "#E15759", linewidth = 1, linetype = "dotted", lineend = "round") +
-    
-    geom_point(fill = "grey", color = "grey10", shape = 21, size = 1.5, stroke = .1, 
-               position = position_jitternormal(sd_y = 0, sd_x = .075)) +
-    
-    geom_violin(color = NA, alpha = .5, fill = "grey") +
-    
-    
-    
-    geom_boxplot(fill = "#4E79A7" |> lighten(.15), width = .25, outliers = FALSE, linewidth = .25) +
-    
-    # stat_pointinterval(color = "#4E79A7" |> darken(.25)) +
-        
-    scale_x_reordered() +
-    scale_y_continuous(transform = "log10",
-                       breaks = scales::trans_breaks("log10", function(x) 10^x),
-                       labels = scales::trans_format("log10", scales::math_format(10^.x))) +
-    
-    facet_wrap2(vars(variable), nrow = 1, scales = "free_x", axes = "all") +
-    
-    theme_minimal(base_family = "Calibri") +
-    
-    theme(
-        legend.position = "none",
-        axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
-        axis.text.y = element_text(size = 14),
-        
-        strip.text = element_markdown(size = 14),
-        
-        axis.title.x = element_markdown(margin = margin(t = 10), size = 14),
-        axis.title.y = element_blank(), # element_markdown(margin = margin(r = 10)),
-        
-        # axis.ticks = element_line(linewidth = .3),
-        panel.grid.major.y = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
-        
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        
-        # panel.border = element_rect(linewidth = .3, fill = NA),
-        
-        axis.line = element_line(lineend = "round"),
-        axis.ticks = element_line(lineend = "round")
-    ) +
-    
-    labs(x = "**EDAM** operation")
-    
+  ggplot(aes(reorder_within(cluster, -value_median, variable), value)) +
+  geom_hline(data = hg2, aes(yintercept = value), color = "white", linewidth = 1.15) +
+  geom_hline(data = hg2, aes(yintercept = value), color = "#E15759", linewidth = 1, linetype = "dotted", lineend = "round") +
+  geom_point(
+    fill = "grey", color = "grey10", shape = 21, size = 1.5, stroke = .1,
+    position = position_jitternormal(sd_y = 0, sd_x = .075)
+  ) +
+  geom_violin(color = NA, alpha = .5, fill = "grey") +
+  geom_boxplot(fill = "#4E79A7" |> lighten(.15), width = .25, outliers = FALSE, linewidth = .25) +
+
+  # stat_pointinterval(color = "#4E79A7" |> darken(.25)) +
+
+  scale_x_reordered() +
+  scale_y_continuous(
+    transform = "log10",
+    breaks = scales::trans_breaks("log10", function(x) 10^x),
+    labels = scales::trans_format("log10", scales::math_format(10^.x))
+  ) +
+  facet_wrap2(vars(variable), nrow = 1, scales = "free_x", axes = "all") +
+  theme_minimal(base_family = "Calibri") +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
+    axis.text.y = element_text(size = 14),
+    strip.text = element_markdown(size = 14),
+    axis.title.x = element_markdown(margin = margin(t = 10), size = 14),
+    axis.title.y = element_blank(), # element_markdown(margin = margin(r = 10)),
+
+    # axis.ticks = element_line(linewidth = .3),
+    panel.grid.major.y = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+
+    # panel.border = element_rect(linewidth = .3, fill = NA),
+
+    axis.line = element_line(lineend = "round"),
+    axis.ticks = element_line(lineend = "round")
+  ) +
+  labs(x = "**EDAM** operation")
+
 
 # df3 <- df2[, by = .(`Galaxy wrapper id`, `Total tool usage (usegalaxy.eu)`, `No. of tool users (2022-2023) (usegalaxy.eu)`), .(
 #     clusters = cluster |> sort() |> paste(collapse = ", "),
 #     Nclusters = cluster |> length()
 # )]
-# 
+#
 # df3$clusters <- ifelse(
 #     df3$clusters == "Other Operations" | df3$clusters == "Other Operations, No Operation",
 #     "Other Operations", df3$clusters
 # )
-# 
+#
 # h1 <- h0[, c("Galaxy wrapper id", "Total tool usage (usegalaxy.eu)", "No. of tool users (2022-2023) (usegalaxy.eu)")] |>
 #     unique()
-# 
+#
 # a1 <- ggplot(df3, aes(`Total tool usage (usegalaxy.eu)`, `No. of tool users (2022-2023) (usegalaxy.eu)`)) +
-#     
+#
 #     geom_point(shape = 21, size = 2, stroke = .2, color = "grey25", aes(fill = clusters)) +
-#     
+#
 #     geom_text_repel(
 #         data = h1, inherit.aes = FALSE,
 #         mapping = aes(
@@ -573,79 +556,76 @@ b <- plot_dt_2 |>
 #         bg.color = "grey96", family = "Calibri", box.padding = .5,
 #         segment.size = .3, max.overlaps = Inf
 #     ) +
-# 
+#
 #     scale_fill_manual(
 #         values = paletteer_d("ggsci::default_igv"),
 #         guide = guide_legend(ncol = 4)
 #     ) +
-#     
+#
 #     scale_x_continuous(
-#         trans = "log10",  # expand = c(0, 0), 
-#         limits = c(1, 10000000), 
+#         trans = "log10",  # expand = c(0, 0),
+#         limits = c(1, 10000000),
 #         breaks = scales::trans_breaks("log10", function(x) 10^x),
 #         labels = scales::trans_format("log10", scales::math_format(10^.x))
 #     ) +
-#     
+#
 #     scale_y_continuous(
 #         trans = "log10", # limits = c(1, 10000),
-#         labels = scales::comma, # expand = c(0, 0), 
+#         labels = scales::comma, # expand = c(0, 0),
 #         breaks = c(.1, 1, 10, 100, 1000, 10000)
 #     ) +
-#     
+#
 #     coord_cartesian() +
-#     
+#
 #     theme_minimal(base_family = "Calibri") +
-#     
+#
 #     theme(
 #         legend.position = "bottom",
 #         legend.justification = "left",
 #         legend.title = element_blank(),
-#         
+#
 #         strip.text = element_markdown(),
-#         
+#
 #         axis.title.x = element_markdown(margin = margin(t = 10)),
 #         axis.title.y = element_markdown(margin = margin(r = 10)),
-#         
+#
 #         axis.ticks = element_line(linewidth = .3),
-#         
+#
 #         panel.grid.minor = element_blank(),
 #         panel.grid.major = element_line(linewidth = .3, linetype = "dashed", color = "grey75"),
-#         
+#
 #         panel.border = element_rect(linewidth = .3, fill = NA),
-#         
+#
 #         plot.margin = margin(20, 20, 20, 20)
 #     ) +
-#     
+#
 #     labs(
 #         x = "**Total tool usage** (usegalaxy.eu)",
 #         y = "**No. of tool users 2022-2023** (usegalaxy.eu)"
 #     )
-
 ```
 
 ### Save plot
 
 ```{r}
-
 # outfolder <- paste0("../results/tools/", xvar |> str_remove_all("Suite|runs|\\*|\\(|\\)") |> str_squish())
-# 
+#
 # dir.create(outfolder)
-# 
+#
 # ggsave(
 #     plot = a, filename = paste0(outfolder, "/tools-scatter-plot.png"),
 #     width = 12, height = 9, units = "in", dpi = 600
 # )
-# 
+#
 # ggsave(
 #     plot = a, filename = paste0(outfolder, "/tools-scatter-plot.svg"),
 #     width = 12, height = 9, units = "in"
 # )
-# 
+#
 # ggsave(
 #     plot = a, filename = paste0(outfolder, "/tools-scatter-plot.pdf"),
 #     width = 12, height = 9, units = "in", device = cairo_pdf
 # )
-
 ```
 
 ## ARCHIVED EDAM topic: Faceted scatter plot 
@@ -655,133 +635,132 @@ b <- plot_dt_2 |>
 # df2 = tools_dt |>
 #     tidyr::separate_rows("EDAM topic (no superclasses)", sep = ",") |>
 #     setDT()
-# 
+#
 # # remove empty tools ------------------
 # df2 = df2[which(
-#     `Total tool usage (usegalaxy.eu)` != 0 & 
+#     `Total tool usage (usegalaxy.eu)` != 0 &
 #         `No. of tool users (2022-2023) (usegalaxy.eu)` != 0
 # )]
-# 
+#
 # # clean `EDAM topic (no superclasses)` column -------------
 # df2$`EDAM topic (no superclasses)` = df2$`EDAM topic (no superclasses)` |> str_squish()
 # df2$`EDAM topic (no superclasses)` = ifelse(df2$`EDAM topic (no superclasses)` == "", "No Topic", df2$`EDAM topic (no superclasses)`)
-# 
+#
 # # find most top #11 EDAM topic (no superclasses)s ------------------
 # st = df2[, by = `EDAM topic (no superclasses)`, .(N = `Galaxy wrapper id` |> unique() |> length())]
 # st = st[order(-N)]
 # st = st[seq_len(11)]
-# 
+#
 # # define every other operation as Other Operations ------------
 # df2$cluster = ifelse(
 #     df2$`EDAM topic (no superclasses)` %in% st$`EDAM topic (no superclasses)`,
 #     df2$`EDAM topic (no superclasses)`, "Other Topics"
 # )
-# 
+#
 # # keep only necessary columns -------------------
 # df2 = df2[, c(
-#     "Galaxy wrapper id", 
-#     "Total tool usage (usegalaxy.eu)", 
-#     "No. of tool users (2022-2023) (usegalaxy.eu)", 
+#     "Galaxy wrapper id",
+#     "Total tool usage (usegalaxy.eu)",
+#     "No. of tool users (2022-2023) (usegalaxy.eu)",
 #     "cluster"
 # )] |> unique()
-# 
+#
 # # number of tools per operation ------------------------
 # df2 = df2[, by = cluster, N := `Galaxy wrapper id` |> unique() |> length()]
-# 
+#
 # # define factor levels of cluster column ----------------------
-# df2$cluster = df2$cluster |> 
+# df2$cluster = df2$cluster |>
 #     factor(
 #         levels = c(
-#             st$`EDAM topic (no superclasses)` |> str_subset("No Topic", negate = TRUE), 
+#             st$`EDAM topic (no superclasses)` |> str_subset("No Topic", negate = TRUE),
 #             "Other Topics", "No Topic"
 #         )
 #     )
-# 
+#
 # df2 = df2[order(cluster)]
-# 
+#
 # # define strip for plotting -------------------------------
 # df2$strip = paste0("**", df2$cluster, "** (", df2$N, " tools)")
 # df2$strip = df2$strip |> factor(levels = df2$strip |> unique())
-# 
+#
 # # gather highlighting Galaxy wrapper tools for plotting ---------------
-# 
+#
 # df2 <- df2[order(
 #     -`No. of tool users (2022-2023) (usegalaxy.eu)`,
 #     -`Total tool usage (usegalaxy.eu)`
 # )]
-# 
+#
 # h0 <- df2[, by = strip, head(.SD, 10)]
-# 
+#
 # # h0 = rbind(
 # #     df2[, by = strip, .SD[which.max(`Total tool usage (usegalaxy.eu)`)]],
 # #     df2[, by = strip, .SD[which.max(`No. of tool users (2022-2023) (usegalaxy.eu)`)]]
 # # ) |> unique()
-# 
+#
 # # create graph ----------------------------
 # b <- ggplot(df2, aes(`Total tool usage (usegalaxy.eu)`, `No. of tool users (2022-2023) (usegalaxy.eu)`)) +
-#     
-#     geom_point(shape = 21, size = 2, stroke = .25, 
+#
+#     geom_point(shape = 21, size = 2, stroke = .25,
 #                color = "#2E2A2B" |> darken(.5), fill = "#2E2A2B" |> lighten(.5)) +
-#     
+#
 #     geom_text_repel(
-#         data = h0, inherit.aes = FALSE, 
+#         data = h0, inherit.aes = FALSE,
 #         mapping = aes(
-#             `Total tool usage (usegalaxy.eu)`, 
-#             `No. of tool users (2022-2023) (usegalaxy.eu)`, 
+#             `Total tool usage (usegalaxy.eu)`,
+#             `No. of tool users (2022-2023) (usegalaxy.eu)`,
 #             label = `Galaxy wrapper id`
 #         ),
 #         bg.color = "grey96", family = "Calibri", box.padding = .5,
 #         segment.size = .3, size = 3, max.overlaps = Inf
 #     ) +
-#     
+#
 #     scale_x_continuous(
 #         trans = "log10",  # expand = c(0, 0), limits = c(1, 10000000),
 #         breaks = scales::trans_breaks("log10", function(x) 10^x),
 #         labels = scales::trans_format("log10", scales::math_format(10^.x))
 #     ) +
-#     
+#
 #     scale_y_continuous(
 #         trans = "log10", # limits = c(1, 10000),
-#         labels = scales::comma, # expand = c(0, 0), 
+#         labels = scales::comma, # expand = c(0, 0),
 #         breaks = c(.1, 1, 10, 100, 1000, 10000)
 #     ) +
-#     
+#
 #     guides(
 #         alpha = guide_legend(
 #             title = "Perc. of observations (tools)",
-#             title.position = "top", 
+#             title.position = "top",
 #             title.theme = element_text(family = "Calibri")
 #         )
 #     ) +
-#     
+#
 #     facet_wrap(vars(strip), nrow = 3, axes = "all") +
-#     
+#
 #     coord_cartesian() +
-#     
+#
 #     theme_minimal(base_family = "Calibri") +
-#     
+#
 #     theme(
 #         legend.position = "bottom",
 #         legend.justification = "left",
-#         
+#
 #         strip.text = element_markdown(),
-#         
+#
 #         axis.title.x = element_markdown(margin = margin(t = 10)),
 #         axis.title.y = element_markdown(margin = margin(r = 10)),
-#         
+#
 #         axis.ticks = element_line(linewidth = .3),
-#         
+#
 #         panel.grid.minor = element_blank(),
 #         panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
-#         
+#
 #         panel.border = element_rect(linewidth = .3, fill = NA)
 #     ) +
-#     
+#
 #     labs(
 #         x = "**Total tool usage** (usegalaxy.eu)",
 #         y = "**No. of tool users 2022-2023** (usegalaxy.eu)"
 #     )
-
 ```
 
 
@@ -820,57 +799,47 @@ d4 <- d2 |> merge(d3, by = "Date", all = TRUE)
 d4$category.x <- "Tutorials"
 d4$category.y <- "Workflows"
 
-for(i in seq_along(d4$Date)) {
-    
-    if(i == 1) {
-        d4[i]$ypos.x <- 1
-        d4[i]$ypos.y <- 1
-    } 
-    
-    if( is.na(d4[i]$ypos.x) ) d4[i]$ypos.x <- d4[i - 1]$ypos.x
-    if( is.na(d4[i]$ypos.y) ) d4[i]$ypos.y <- d4[i - 1]$ypos.y
-    
+for (i in seq_along(d4$Date)) {
+  if (i == 1) {
+    d4[i]$ypos.x <- 1
+    d4[i]$ypos.y <- 1
+  }
+
+  if (is.na(d4[i]$ypos.x)) d4[i]$ypos.x <- d4[i - 1]$ypos.x
+  if (is.na(d4[i]$ypos.y)) d4[i]$ypos.y <- d4[i - 1]$ypos.y
 }
 
 d1_p <- ggplot() +
-    geom_area(data = d1, aes(Date, ypos), fill = "#4E79A7", alpha = .1) +
-    
-    stat_difference(data = d4, aes(Date, ymin = ypos.y, ymax = ypos.x), alpha = 0.5, levels = c("More tutorials", "More workflows"),) +
+  geom_area(data = d1, aes(Date, ypos), fill = "#4E79A7", alpha = .1) +
+  stat_difference(data = d4, aes(Date, ymin = ypos.y, ymax = ypos.x), alpha = 0.5, levels = c("More tutorials", "More workflows"), ) +
+  geom_line(data = d1, aes(Date, ypos, color = category), linewidth = .75) +
+  geom_line(data = d4, aes(Date, ypos.x, color = category.x), linewidth = .75) +
+  geom_line(data = d4, aes(Date, ypos.y, color = category.y), linewidth = .75) +
+  scale_x_date(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(50, 300, by = 50), limits = c(0, 300)) +
+  scale_fill_manual(values = c("More tutorials" = "#F28E2B", "More workflows" = "#E15759")) +
+  scale_color_manual(values = c("Tool suites" = "#4E79A7", "Tutorials" = "#F28E2B", "Workflows" = "#E15759")) +
+  theme_minimal(base_family = "Calibri") +
+  theme(
+    legend.title = element_blank(),
+    legend.text = element_text(size = 14),
+    legend.position.inside = c(.25, .75),
+    legend.position = "inside",
+    panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
+    axis.title.x = element_markdown(margin = margin(t = 10), face = "bold", size = 14),
+    axis.title.y = element_markdown(margin = margin(r = 10), size = 14),
+    axis.text = element_text(size = 14),
+    axis.line = element_line(lineend = "round"),
+    axis.ticks = element_line(lineend = "round")
+  ) +
+  labs(y = "Cumulative number of<br>**tool suites**, **tutorials**, and **workflows**")
 
-    geom_line(data = d1, aes(Date, ypos, color = category), linewidth = .75) +
-    geom_line(data = d4, aes(Date, ypos.x, color = category.x), linewidth = .75) +
-    geom_line(data = d4, aes(Date, ypos.y, color = category.y), linewidth = .75) +
-    
-    scale_x_date(expand = c(0, 0)) +
-    scale_y_continuous(expand = c(0, 0), breaks = seq(50, 300, by = 50), limits = c(0, 300)) +
-    
-    scale_fill_manual(values = c("More tutorials" = "#F28E2B", "More workflows" = "#E15759")) +
-    scale_color_manual(values = c("Tool suites" = "#4E79A7", "Tutorials" = "#F28E2B", "Workflows" = "#E15759")) +
-    theme_minimal(base_family = "Calibri") +
-    theme(
-        legend.title = element_blank(),
-        legend.text = element_text(size = 14),
-        legend.position.inside = c(.25, .75),
-        legend.position = "inside",
-        
-        panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
-        
-        axis.title.x = element_markdown(margin = margin(t = 10), face = "bold", size = 14),
-        axis.title.y = element_markdown(margin = margin(r = 10), size = 14),
-        
-        axis.text = element_text(size = 14),
-        
-        axis.line = element_line(lineend = "round"),
-        axis.ticks = element_line(lineend = "round")
-    ) +
-    labs(y = "Cumulative number of<br>**tool suites**, **tutorials**, and **workflows**")
-    
 
 # d1_p <- d1 |>
 #     ggplot(aes(`Suite first commit date`, ypos)) +
 #     geom_line(linewidth = .45, color = "#3C3C3C") +
 #     geom_area(alpha = .25) +
-#     
+#
 #     # geom_point(data = d2, aes(year, N)) +
 #     scale_x_date(expand = c(0.01, 0.01)) +
 #     scale_y_continuous(expand = c(0, 0), breaks = seq(50, 300, by = 50), limits = c(0, 300))+
@@ -878,12 +847,12 @@ d1_p <- ggplot() +
 #     theme(
 #         # panel.grid.major = element_line(linewidth = .45, color = "grey85"),
 #         # panel.grid.minor = element_line(linewidth = .35),
-#         
+#
 #         panel.grid.major = element_line(linewidth = .3, linetype = "dashed", lineend = "round", color = "grey75"),
-#         
+#
 #         axis.title.x = element_markdown(margin = margin(t = 10)),
 #         axis.title.y = element_markdown(margin = margin(r = 10)),
-#         
+#
 #         axis.line = element_line(lineend = "round"),
 #         axis.ticks = element_line(lineend = "round")
 #     ) +
@@ -893,21 +862,20 @@ d1_p <- ggplot() +
 ### Save plot
 
 ```{r}
-
 # outfolder <- "../results/tools/number of tools"
-# 
+#
 # dir.create(outfolder)
-# 
+#
 # ggsave(
 #     plot = d1_p, filename = paste0(outfolder, "/ntools.png"),
 #     width = 9, height = 8, units = "in", dpi = 600
 # )
-# 
+#
 # ggsave(
 #     plot = d1_p, filename = paste0(outfolder, "/ntools.svg"),
 #     width = 9, height = 8, units = "in"
 # )
-# 
+#
 # ggsave(
 #     plot = d1_p, filename = paste0(outfolder, "/ntools.pdf"),
 #     width = 9, height = 8, units = "in", device = cairo_pdf
@@ -918,18 +886,17 @@ d1_p <- ggplot() +
 ## Patchwork 
 
 ```{r}
-
 library(patchwork)
 
-multi <- ((d1_p | a) / b) + 
-    # plot_layout(heights = c(1, 2)) +
-    plot_annotation(tag_levels = "A") &
-    theme(
-        plot.tag = element_text(face = "bold", size = 22, family = "Calibri"),
-        plot.margin = margin(10, 10, 10, 15)
-    )
+multi <- ((d1_p | a) / b) +
+  # plot_layout(heights = c(1, 2)) +
+  plot_annotation(tag_levels = "A") &
+  theme(
+    plot.tag = element_text(face = "bold", size = 22, family = "Calibri"),
+    plot.margin = margin(10, 10, 10, 15)
+  )
 
-# multi <- (free(c_1) | (a / d1_p)) + 
+# multi <- (free(c_1) | (a / d1_p)) +
 #     plot_layout(widths = c(2, 1.5)) +
 #     plot_annotation(tag_levels = "A") &
 #     theme(
@@ -943,22 +910,20 @@ outfolder <- "../docs/extended/"
 dir.create(outfolder, showWarnings = FALSE)
 
 save_plot <- function(plot, filename, w, h) {
-    
-    ggsave(
-        plot = plot, filename = paste0(filename, ".png"),
-        width = w, height = h, units = "in", dpi = 600
-    )
-    
-    ggsave(
-        plot = plot, filename = paste0(filename, ".svg"),
-        width = w, height = h, units = "in", dpi = 600
-    )
-    
-    ggsave(
-        plot = plot, filename = paste0(filename, ".pdf"),
-        width = w, height = h, units = "in", device = cairo_pdf
-    )
-    
+  ggsave(
+    plot = plot, filename = paste0(filename, ".png"),
+    width = w, height = h, units = "in", dpi = 600
+  )
+
+  ggsave(
+    plot = plot, filename = paste0(filename, ".svg"),
+    width = w, height = h, units = "in", dpi = 600
+  )
+
+  ggsave(
+    plot = plot, filename = paste0(filename, ".pdf"),
+    width = w, height = h, units = "in", device = cairo_pdf
+  )
 }
 
 save_plot(multi, "../docs/figures/figure_3", 10, 12)
@@ -967,17 +932,16 @@ save_plot(multi, "../docs/figures/figure_3", 10, 12)
 #     plot = multi, filename = paste0(outfolder, "/extended_figure_3.png"),
 #     width = 14, height = 15, units = "in", dpi = 600
 # )
-# 
+#
 # ggsave(
 #     plot = multi, filename = paste0(outfolder, "/extended_figure_3.pdf"),
 #     width = 14, height = 15, units = "in", device = cairo_pdf
 # )
-# 
+#
 # ggsave(
 #     plot = multi, filename = paste0(outfolder, "/extended_figure_3.svg"),
 #     width = 14, height = 15, units = "in"
 # )
-
 ```
 
 
