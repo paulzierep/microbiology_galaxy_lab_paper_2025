@@ -71,7 +71,7 @@ plot_figure_3A <- function() {
     geom_line(data = d4, aes(Date, ypos.x, color = category.x), linewidth = .75) +
     geom_line(data = d4, aes(Date, ypos.y, color = category.y), linewidth = .75) +
     scale_x_date(expand = c(0, 0)) +
-    scale_y_continuous(expand = c(0, 0), breaks = seq(50, 300, by = 50), limits = c(0, 300)) +
+    scale_y_continuous(expand = c(0, 0), breaks = seq(50, 300, by = 50), limits = c(0, 325)) +
     scale_fill_manual(values = c("More tutorials" = "#F28E2B", "More workflows" = "#E15759")) +
     scale_color_manual(values = c("Tool suites" = "#4E79A7", "Tutorials" = "#F28E2B", "Workflows" = "#E15759")) +
     theme_minimal(base_family = "Calibri") +
