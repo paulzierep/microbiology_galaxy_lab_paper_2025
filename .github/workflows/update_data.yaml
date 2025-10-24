@@ -39,7 +39,7 @@ jobs:
       - name: Build figures
         shell: bash -l {0}
         run: |
-          bash /bin/build_figures.sh
+          bash bin/build_figures.sh
 
       - name: Archive data
         uses: actions/upload-artifact@v4
