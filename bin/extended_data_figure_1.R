@@ -54,7 +54,7 @@ suppressWarnings({
     geom_col(width = .75, fill = "#4E79A7" |> lighten(.25), color = "grey25", linewidth = .15) +
     geom_point(color = "#4E79A7" |> lighten(.25), size = 4.63 + .4) +
     scale_x_reordered() +
-    scale_y_continuous(labels = scales::percent, limits = c(0, .4), expand = c(0, 0)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, .5), expand = c(0, 0)) +
     facet_grid2(cols = vars(variable), scales = "free_x", space = "free_x", axes = "all") +
     theme_minimal(base_family = "Calibri") +
     theme(
