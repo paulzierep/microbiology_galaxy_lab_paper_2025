@@ -16,14 +16,39 @@ jobs:
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
+
+
       - name: Update data
         run: |
           bash bin/get_data.sh
+
+      - name: Set up Mambaforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          environment-file: environment.yml
+          activate-environment: microgalaxy_paper
+          use-mamba: true
+          auto-activate-base: false
+
+      - name: Install CRAN-only R packages
+        shell: bash -l {0}
+        run: |
+          R -q -e 'install.packages(c("ggstream"), repos="https://cloud.r-project.org")'
+
+      - name: Build figures
+        shell: bash -l {0}
+        run: |
+          bash /bin/build_figures.sh
+
       - name: Archive data
         uses: actions/upload-artifact@v4
         with:
           name: data
           path: docs/supplementary/available_public_servers.csv
+
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
@@ -33,4 +58,3 @@ jobs:
           base: main
           branch: update-data
           delete-branch: true
-      
