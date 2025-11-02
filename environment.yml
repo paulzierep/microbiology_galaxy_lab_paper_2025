@@ -1,28 +1,43 @@
 name: microgalaxy_technical_paper
 channels:
-- conda-forge
-- defaults
-- bioconda
+  - conda-forge
+  - bioconda
+
 dependencies:
-- jupyter
-- pandas
-- matplotlib
-- pyzotero
-- scholarly
-- fake-useragent
-- r-base
-- r-data.table
-- r-stringr
-- r-rmarkdown
-- r-tidytext
-- r-tidyr
-- r-ggplot2
-- r-ggrepel
-- r-ggtext
-- r-ggh4x
-- r-shadowtext
-- r-extrafont
-- r-paletteer
-- r-colorspace
-- r-packcircles
-- r-patchwork
+  # Python
+  - jupyter
+  - pandas
+  - matplotlib
+  - pyzotero
+  - scholarly
+  - fake-useragent
+
+  # R core
+  - r-base
+  - r-data.table
+  - r-stringr
+  - r-rmarkdown
+  - r-lubridate
+  - r-countrycode
+
+  # R visualization & text analysis
+  - r-tidytext
+  - r-tidyr
+  - r-ggplot2
+  - r-ggrepel
+  - r-ggtext
+  - r-ggh4x
+  - r-ggdist
+  - r-ggforce
+  - r-ggdensity
+  - r-ggthemes      
+  - r-shadowtext
+  - r-extrafont
+  - r-paletteer
+  - r-colorspace
+  - r-patchwork
+  - r-svglite
+  - r-writexl
+
+# note: ggstream needs to be installed manually: 
+# R -q -e 'install.packages("ggstream", repos="https://cloud.r-project.org")'
