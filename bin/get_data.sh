@@ -15,20 +15,20 @@ wget \
     -O "docs/supplementary/supplementary_table_2.tsv" \
     "https://raw.githubusercontent.com/galaxyproject/galaxy_codex/refs/heads/main/communities/microgalaxy/resources/curated_tools.tsv" 
 
-# Get use cases
-wget \
-    -O "docs/supplementary/supplementary_table_3.tsv" \
-    "https://docs.google.com/spreadsheets/d/1fGbDFk5u4vwrjcdN8zWXHEvxkLUYJSx_nbK1XUeSZyk/export?format=tsv"  
-
 # Get tool suites number of figure 3
 wget \
-    -O "docs/supplementary/supplementary_table_4.tsv" \
+    -O "docs/supplementary/supplementary_table_3.tsv" \
     "https://docs.google.com/spreadsheets/d/1iG7qXbiMUrQsPxVuIXAvDgyrGK9PWyWpxy1IyDCB2TQ/export?format=tsv"  
 
 # Get workflows table
 wget \
-    -O "docs/supplementary/supplementary_table_5.tsv" \
+    -O "docs/supplementary/supplementary_table_4.tsv" \
     "https://raw.githubusercontent.com/galaxyproject/galaxy_codex/refs/heads/main/communities/microgalaxy/resources/curated_workflows.tsv" 
+
+# Get use cases
+wget \
+    -O "docs/supplementary/supplementary_table_5.tsv" \
+    "https://docs.google.com/spreadsheets/d/1fGbDFk5u4vwrjcdN8zWXHEvxkLUYJSx_nbK1XUeSZyk/export?format=tsv"  
     
 # Get tutorials table
 wget \
