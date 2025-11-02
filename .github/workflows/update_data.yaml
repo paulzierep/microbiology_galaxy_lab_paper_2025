@@ -25,7 +25,6 @@ jobs:
       - name: Set up Mambaforge
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
           miniforge-version: latest
           environment-file: environment.yml
           activate-environment: microgalaxy_paper
@@ -47,7 +46,6 @@ jobs:
         with:
           name: data
           path: docs/supplementary/available_public_servers.csv
-
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
